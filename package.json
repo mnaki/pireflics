@@ -19,9 +19,12 @@
     "grunt-sails-linker": "~0.10.1",
     "grunt-sync": "0.2.4",
     "include-all": "~0.1.6",
+    "kickass-api": "0.0.3",
     "rc": "1.0.1",
     "sails": "~0.12.3",
-    "sails-disk": "~0.10.9"
+    "sails-disk": "~0.10.9",
+    "sails-mongo": "^0.12.0",
+    "thepiratebay": "^1.1.8"
   },
   "scripts": {
     "debug": "node debug app.js",
