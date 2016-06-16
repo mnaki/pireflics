@@ -4,9 +4,9 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8">
   <title>Matcha</title>
-  <link href="styles/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <link href="styles/style.css" rel="stylesheet" type="text/css">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link href="/styles/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="/styles/style.css" rel="stylesheet" type="text/css">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
   <link href='https://fonts.googleapis.com/css?family=Seaweed+Script' rel='stylesheet' type='text/css'>
   <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
 </head>
@@ -22,13 +22,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <img src="images/logo.png" alt="Icone du menu" id="logo">
+          <a href="/"><img src="/images/logo.png" alt="Icone du menu" id="logo"></a>
         </div>
         <div class="collapse navbar-collapse" id="menu">
           <ul class="nav navbar-nav">
-            <% if(0){ %>
+            <% if(1){ %>
               <li>
-                <a href="#">Connexion</a>
+                <a href="/user/connexion">Connexion</a>
               </li>
             <% } else { %>
               <li>
@@ -63,6 +63,6 @@
       </div>
     </footer>
     </div>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
   </body>
 </html>

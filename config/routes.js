@@ -34,7 +34,20 @@ module.exports.routes = {
 
   '/': {
     view: 'homepage'
-  }
+  },
+  '/user/connexion': {
+    view: 'user/connexion'
+  },
+  '/user/register': {
+    view: 'user/register'
+  },
+  '/user/lost_password': {
+    view: 'user/lost_password'
+  },
+  '/user/new_user': {
+    controller: 'UserController',
+    action: 'new_user'
+  },
 
   /***************************************************************************
   *                                                                          *
