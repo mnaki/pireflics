@@ -7,13 +7,14 @@
 
 const kickass   = require('kickass-api');
 const piratebay = require('thepiratebay');
+const ptn       = require('parse-torrent-name');
 
 module.exports = {
 
   /**
    * `CrawlerService.search()`
    */
-  search: function (name) {
+  search: function (name, callback) {
     
     // start both query in parallel, first finish, first choosen
     async.race([
@@ -78,18 +79,21 @@ module.exports = {
     ],
     function(err, result) {
         // if we got a error, we must have found nothing
-        if (err) return { found: false };
+        if (err) {
+            callback(true, null);
+            return ;
+        }
 
         // we need to normalise the json return to handle it no matter where it has been crawled  
         var torrent = {};
         if (result.source == "kickass") {
-            torrent.name = result.title;
+            torrent.info = ptn(result.title);
             torrent.size = result.size;
             torrent.magnet = result.magnet;
             torrent.link = result.torrentLink;
             torrent.seeds = result.seeds;
         } else if (result.source == "piratebay") {
-            torrent.name = result.name;
+            torrent.info = ptn(result.name);
             torrent.size = result.size;
             torrent.magnet = result.magnetLink;
             torrent.link = result.link;
@@ -97,7 +101,7 @@ module.exports = {
         }
 
         // and return the torrent with all data inside
-        return { found: true, torrent: torrent };
+        callback(false, torrent);
     });
   }
 };

@@ -20,6 +20,7 @@
     "grunt-sync": "0.2.4",
     "include-all": "~0.1.6",
     "kickass-api": "0.0.3",
+    "parse-torrent-name": "^0.5.4",
     "rc": "1.0.1",
     "sails": "~0.12.3",
     "sails-disk": "~0.10.9",
