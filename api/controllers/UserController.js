@@ -7,6 +7,7 @@
 
 module.exports = {
     new_user: function(req, res){
+        //https://www.npmjs.com/package/validator
         var validator = require('validator');
 
         console.log(req.param("email"));
