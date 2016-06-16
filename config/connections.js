@@ -56,14 +56,14 @@ module.exports.connections = {
   * Run: npm install sails-mongo                                             *
   *                                                                          *
   ***************************************************************************/
-  someMongodbServer: {
+  mongodb: {
     adapter: 'sails-mongo',
     host: 'status.hardfight.fr',
-    port: 2557
-  //   user: 'username', //optional
-  //   password: 'password', //optional
-  //   database: 'your_mongo_db_name_here' //optional
-   },
+    port: 2557,
+    //   user: 'username', //optional
+    //   password: 'password', //optional
+    //   database: 'your_mongo_db_name_here' //optional
+  },
 
   /***************************************************************************
   *                                                                          *

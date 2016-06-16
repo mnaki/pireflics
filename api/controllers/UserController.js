@@ -7,10 +7,14 @@
 
 module.exports = {
     new_user: function(req, res){
-        console.log(req.param("pseudo"));
-        console.log(req.session);
-        req.session.user = req.param('pseudo');
-        console.log(req.session);
+        var validator = require('validator');
+
+        console.log(req.param("email"));
+        if(validator.isEmail(req.param('email'))){
+            console.log('c est un email');
+        }
+        else
+            console.log('c est pas un email');
     }
 	
 };
