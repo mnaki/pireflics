@@ -8,6 +8,8 @@
 const kickass   = require('kickass-api');
 const piratebay = require('thepiratebay');
 const ptn       = require('parse-torrent-name');
+const async2 	= require("async");
+const bytesize	= require("byte-size");
 
 module.exports = {
 
@@ -17,13 +19,11 @@ module.exports = {
   search: function (name, callback) {
     
     // start both query in parallel, first finish, first choosen
-    async.race([
+    async2.parallel([
         // search via kickass api
         function(callback){
             kickass.search({
                 query: name,
-                category: 'movies',
-                verified: 1,
                 sort_by: 'seeders',
                 order: 'desc',
                 language: 'en'
@@ -34,74 +34,74 @@ module.exports = {
                     response.results[0].source = "kickass";
                     callback(null, response.results[0])
                 }
-                // if we found nothing, wait one second for the other research to complete otherwise return no result
+                // if we found nothing
                 else 
-                    setTimeout(function(){
-                        callback(true);
-                    }, 1000);
+                    callback(true);
             }).catch(function (error) {
-                 // if we got an error, wait one second for the other research to complete otherwise return no result
-                 setTimeout(function(){
-                        callback(true);
-                }, 1000);
+            	callback(true);
             });
         },
         // search via piratebay api
-        function(callback){
+        function(callback) {
             piratebay.search(name, {
                 category: 'all',
                 filter: {
-                    verified: true  
+                    verified: false  
                 },
                 orderBy: 'seeds',
                 sortBy: 'desc' 
             })
-            .then(function(results) {
+            .then(function(response) {
                 // if we get a result return it
                 if (response.length > 0) {
                     // set his source to normalise it after
                     response[0].source = "piratebay";
-                    callback(null, response[0])
+                    callback(null, response[0]);
                 }
-                // if we found nothing, wait one second for the other research to complete otherwise return no result
+                // if we found nothing
                 else 
-                    setTimeout(function(){
-                        callback(true);
-                    }, 1000);
+                    callback(true);
             })
             .catch(function(err) {
-                // if we got an error, wait one second for the other research to complete otherwise return no result
-                 setTimeout(function(){
-                        callback(true);
-                }, 1000);
+                callback(true);
             })
         }
     ],
     function(err, result) {
         // if we got a error, we must have found nothing
-        if (err) {
+        if (err && result[0] == undefined && result[1] == undefined) {
             callback(true, null);
             return ;
         }
+        
+		var torrent = {};
+		if (result[0] == undefined)
+			torrent = result[1];
+		else if (result[1] == undefined)
+			torrent = result[0];
+		else if (result[0].seeds > result[1].seeders)
+			torrent = result[0];
+		else
+			torrent = result[1];
+		
+		// we need to normalise the json return to handle it no matter where it has been crawled
+		var returned = {};
+		returned.link = torrent.torrentLink || torrent.link;
+		returned.seeds = torrent.seeders || torrent.seeds;
+		returned.source = torrent.source;
+        returned.size = torrent.size;
+		returned.magnet = torrent.magnetLink || torrent.magnet;
+        returned.info = torrent.title || torrent.name;
 
-        // we need to normalise the json return to handle it no matter where it has been crawled  
-        var torrent = {};
-        if (result.source == "kickass") {
-            torrent.info = ptn(result.title);
-            torrent.size = result.size;
-            torrent.magnet = result.magnet;
-            torrent.link = result.torrentLink;
-            torrent.seeds = result.seeds;
-        } else if (result.source == "piratebay") {
-            torrent.info = ptn(result.name);
-            torrent.size = result.size;
-            torrent.magnet = result.magnetLink;
-            torrent.link = result.link;
-            torrent.seeds = result.seeders;
-        }
+		// parse info from name
+		returned.info = ptn(returned.info);
+
+		// prettify size if from kickass
+		if (torrent.source == "kickass")
+       		returned.size = bytesize(torrent.size, { units: 'iec' });
 
         // and return the torrent with all data inside
-        callback(false, torrent);
+        callback(false, returned);
     });
   }
 };

@@ -16,10 +16,6 @@ module.exports = {
         unique: true,
         required: true
     },
-    // name of the torrent file
-    title : {
-        type: 'string'
-    },
     // link to the .torrent
     link : {
         type: 'string'

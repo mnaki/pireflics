@@ -9,32 +9,39 @@ module.exports = {
 	
 
     search: function (req, res) {
-        var name = req.body.name;
+
+        var name = req.query.name;
+		sails.log.info("name : " + name);
 
         // ensure that the name is valid
         if (name == undefined || name.length < 2)
-            return res.sendStatus(400);
+            return res.status(400);
 
         // try to get a torrent already downloaded
-        Torrent.find({ title: { 'like%': name }}).exec(function ( err, torrent) {
+        Torrent.find({ title: { 'like%': name }}).exec(function ( err, results ) {
              // if not crawl it
-            if ( err || torrent == undefined) {
-                CrawlerService.search(name, function (err, result) {
+            if ( err || results.length == 0) {
+				CrawlerService.search(name, function ( err, result ) {
                     // if nothing is found send no result
-                    if (err) {
-                        res.sendStatus(404); return ;
+                    if ( err || result == null) {
+                        res.notFound(); return ;
                     }
 
-                    // set the torrent title if found
-                    result.title = result.info.title;
+					res.ok(result);
 
                     // and register it in the database
-                    Torrent.create(result).exec(function ( err, result ) {
-                        if ( err ) { res.sendStatus( 500 ); return ; }
+                    /*Torrent.create(result).exec(function ( err, result ) {
+						sails.log.info("toto");
+                        if ( err ) { res.status( 500 ); return ; }
 
-                        console.log("Torrent " + name + " found and registered with id " + result.id);
-                    });
+                        sails.log.info("Torrent " + name + " found and registered with id " + result.id);
+						res.ok();
+                    });*/
                 });
+				
+			}
+			else {
+                res.status( 500 ); return ; 
             }
         });
     }
