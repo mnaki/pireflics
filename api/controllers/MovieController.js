@@ -61,9 +61,24 @@ module.exports = {
 			var itemPerPage = req.param('itemPerPage') || 5
 
 			movies = _.slice(movies, (page-1) * itemPerPage, (page) * itemPerPage)
+			
+			var detailed = [];
 
-			if (req.wantsJSON) return res.json(movies);
-			else               return res.send(movies);
+            movies.forEach(function (id) {
+                imdb(id, function(err, data) {
+                  if (err) console.log(err.stack);
+            
+                  if (data) {
+                      detailed.push(data);
+                      if (detailed.length == movies.length) {
+                            if (req.wantsJSON) res.json(detailed);
+        		            else               res.send(detailed);
+                      }
+                  }
+                });
+            });
+
+
 		})
 	}
 };
