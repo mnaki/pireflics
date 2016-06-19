@@ -35,6 +35,10 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
+  '/get_user': {
+    controller: 'UserController',
+    action: 'get_users',
+  },
   '/user/connexion': {
     view: 'user/connexion'
   },
