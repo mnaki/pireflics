@@ -6,41 +6,31 @@
  */
 
 module.exports = {
-
   attributes: {
-    id : {
-        type: 'text',
-        defaultsTo: function() {
-          return uuid.v4();
-        },
-        unique: true,
-        required: true
-    },
+	title:  {
+		type: 'string'
+	},
     // link to the .torrent
     link : {
-        type: 'string'
+        type: 'text'
     },
     // size of the torrent
     size : {
         type: 'string'
     },
+	source : {
+		type: 'string'
+	},
+	seeds : {
+        type: 'string'
+    },
     // magnet url
     magnet : {
-        type: 'string'
+        type: 'text'
     },
     // any additional information on the torrent
     info : {
         type: 'json'
-    },
-    // date of creation
-    created : {
-        type: 'date',
-        defaultsTo: Date.now()
-    },
-    // if the torrent is already download
-    downloaded: {
-        type: 'boolean',
-        defaultsTo: false
     }
   }
 };
