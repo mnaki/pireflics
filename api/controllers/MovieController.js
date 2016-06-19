@@ -8,7 +8,7 @@
 // var readTorrent = require("read-torrent");
 // var nameToImdb = require("name-to-imdb");
 // var ptn = require('parse-torrent-name');
-// var imdb = require('imdb');
+var imdb = require('imdb');
 var omdb = require('omdb');
 var PageScraper = require('page-scraper');
 
@@ -60,17 +60,22 @@ module.exports = {
 			var page = req.param('page') || 1
 			var itemPerPage = req.param('itemPerPage') || 5
 
+			sails.log.debug("movies " + movies)
 			movies = _.slice(movies, (page-1) * itemPerPage, (page) * itemPerPage)
-			
+
 			var detailed = [];
 
-            movies.forEach(function (id) {
-                imdb(id, function(err, data) {
-                  if (err) console.log(err.stack);
-            
+            movies.forEach(function (movie) {
+				sails.log.debug(movie)
+
+                imdb(movie.imdb, function(err, data) {
+                  if (err) sails.log.error(err.stack);
+
                   if (data) {
+					  sails.log.debug("data " + data)
                       detailed.push(data);
                       if (detailed.length == movies.length) {
+						  sails.log.debug("sending response")
                             if (req.wantsJSON) res.json(detailed);
         		            else               res.send(detailed);
                       }
@@ -82,4 +87,3 @@ module.exports = {
 		})
 	}
 };
-
