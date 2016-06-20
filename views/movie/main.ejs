@@ -36,7 +36,7 @@
         return false;
     })
 
-    $.getJSON('/movie/search/popular', function (movies) {
+    $.getJSON('/movie/popular', function (movies) {
         // console.log(movies)
         $('.video-list').html('');
         populateList(movies);
