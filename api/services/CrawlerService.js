@@ -86,7 +86,6 @@ module.exports = {
 		
 		// we need to normalise the json return to handle it no matter where it has been crawled
 		var returned = {};
-		returned.link = torrent.torrentLink || torrent.link;
 		returned.seeds = torrent.seeders || torrent.seeds;
 		returned.source = torrent.source;
         returned.size = torrent.size;
