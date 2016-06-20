@@ -1,0 +1,27 @@
+<form class="searchform" action="" method="get">
+    <input class='movieName' type="text" name="name" value="" placeholder="Warcraft">
+    <input type="submit" name="submit" value="submit">
+</form>
+<script type="text/javascript">
+    $('.searchform').submit(function (e) {
+        var $textBox = $('.searchform .movieName');
+        console.log($textBox.val());
+        $.getJSON('/movie/search/'+$textBox.val(), function (movies) {
+            // console.log(movies)
+            $('.video-list').html('');
+            $.each(movies, function (key, val) {
+                console.log(val)
+                $.ajax({
+                    url: '/movie/partial',
+                    data: {data: val},
+                    success: function (partialData) {
+                        $('.video-list').append(partialData);
+                    }
+                })
+            })
+        })
+        return false;
+    })
+</script>
+<div class='video-list'>
+</div>
