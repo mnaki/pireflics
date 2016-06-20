@@ -7,20 +7,19 @@
 
 module.exports = {
   attributes: {
+    // the title of the torrent
 	title:  {
 		type: 'string'
 	},
-    // link to the .torrent
-    link : {
-        type: 'text'
-    },
     // size of the torrent
     size : {
         type: 'string'
     },
+    // kickass or piratebay
 	source : {
 		type: 'string'
 	},
+    // nbr of seeders
 	seeds : {
         type: 'string'
     },
@@ -31,6 +30,14 @@ module.exports = {
     // any additional information on the torrent
     info : {
         type: 'json'
+    },
+    // if the video has been downloaded
+    download : {
+        type: 'boolean'
+    },
+    // the path to the video file
+    path : {
+        type: 'text'
     }
   }
 };

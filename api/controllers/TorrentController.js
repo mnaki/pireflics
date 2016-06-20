@@ -31,23 +31,26 @@ module.exports = {
                         res.notFound(); return ;
                     }
 
+					sails.log.info("Crawler has found a torrent for " + name + ", registering it ...")
+
 					// set the title to found it next time
 					result.title = result.info.title;
+                    //result.download = false;
 					
                     // and register it in the database
-					Torrent.create(result, function(err, user) {
+					Torrent.create(result, function(err, model) {
 						if (err) return res.serverError(err);
 
-						sails.log.info("Crawler has found a torrent for " + name + ", registering it ...")
-						res.ok(user);
-
+						res.ok(model);
+					    sails.log.info("Download start for torrent " + model.id)
+                        DownloadWorker.download(model);
 					});
                 });
 				
 			}
 			else {
-				sails.log.info("Some torrent has been found for title " + name )
-                res.ok(results[0]); return ; 
+				sails.log.info("A torrent has been found for title " + name )
+                res.ok(results[0]);
             }
         });
     }
