@@ -35,8 +35,8 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
-
-  'GET /movie/search/:name': 'MovieController.search'
+  'get /torrent': 'TorrentController.search',
+  'get /movie/search/:name': 'MovieController.search',
 
   /***************************************************************************
   *                                                                          *
