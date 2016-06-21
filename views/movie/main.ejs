@@ -6,40 +6,4 @@
 <div class='video-list'>
 </div>
 
-<script type="text/javascript">
-
-    var populateList = function(movies) {
-        $.each(movies, function (key, val) {
-            console.log(val)
-            $.ajax({
-                url: '/movie/partial',
-                data: {data: val},
-                success: function (partialData) {
-                    $('.video-list').append(partialData);
-                }
-            })
-        })
-    }
-
-    var search = function (searchText) {
-        $.getJSON('/movie/search/'+searchText, function (movies) {
-            // console.log(movies)
-            $('.video-list').html('');
-            populateList(movies);
-        })
-    };
-
-    $('.searchform').submit(function (e) {
-        var $textBox = $('.searchform .movieName');
-        console.log($textBox.val());
-        search($textBox.val())
-        return false;
-    })
-
-    $.getJSON('/movie/popular', function (movies) {
-        // console.log(movies)
-        $('.video-list').html('');
-        populateList(movies);
-    })
-
-</script>
+<script type="text/javascript" src='/js/movie.js'></script>
