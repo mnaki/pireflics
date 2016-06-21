@@ -1,5 +1,5 @@
 currentPage = 1
-itemPerPage = 5
+itemPerPage = 50
 
 window.onload = ->
   populateList = (movies) ->
