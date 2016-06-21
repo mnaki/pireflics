@@ -35,4 +35,4 @@ window.onload = ->
     if $(window).scrollTop() + $(window).height() > $(document).height() - 5
       console.log 'bottom'
       currentPage = currentPage + 1
-      search $('.searchform .movieName')
+      search $('.searchform .movieName').val()
