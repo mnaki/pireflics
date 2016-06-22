@@ -4,17 +4,11 @@
         <h1 class="text-center">Inscription</h1>
     </div>
     <div class="modal-body">
-        <form method="post" action="/user/new_user">
+        <form method="post" action="/user">
             <div class="row inscr">
-
-                <div class="col-md-6">
-                    <label>Pseudo* :</label>
-                    <input name="pseudo" type="text" value="" class="form-control input-lg" placeholder="Pseudo">
-                </div>
-
                 <div class="col-md-6">
                     <label>Nom* :</label>
-                    <input name="name" type="text" value="" class="form-control input-lg" placeholder="Nom">
+                    <input name="lastname" type="text" value="" class="form-control input-lg" placeholder="Nom">
                 </div>
 
                 <div class="col-md-6">
@@ -31,12 +25,6 @@
                     <label>Mot de passe* :</label>
                     <input name="password" type="password" class="form-control input-lg" placeholder="Mot de passe">
                 </div>
-
-                <div class="col-md-6">
-                    <label>Confirmation mot de passe* :</label>
-                    <input name="val_password" type="password" class="form-control input-lg" placeholder="Répéter le mot de passe">
-                </div>
-
                 <div class="col-md-6">
                     <p>*champs obligatoires</p>
                 </div>

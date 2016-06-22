@@ -35,25 +35,21 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
-  '/get_user': {
-    controller: 'UserController',
-    action: 'get_users',
-  },
-  '/user/connexion': {
+  'get /login': {
     view: 'user/connexion'
   },
-  '/user/register': {
+
+  'post /login': 'AuthController.login',
+
+  '/logout': 'AuthController.logout',
+
+  'get /signup': {
     view: 'user/register'
   },
-  '/user/lost_password': {
-    view: 'user/lost_password'
-  },
-  '/user/new_user': {
-    controller: 'UserController',
-    action: 'new_user'
-  },
 
-  /***************************************************************************
+
+
+/***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
   *                                                                          *
