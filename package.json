@@ -7,6 +7,7 @@
   "dependencies": {
     "async": "^2.0.0-rc.6",
     "bytes": "^2.4.0",
+    "bytes2": "^1.0.1",
     "ejs": "2.3.4",
     "fluent-ffmpeg": "^2.1.0",
     "fs-extra": "^0.30.0",
@@ -39,6 +40,7 @@
     "sails-mysql": "^0.11.5",
     "srt-to-vtt": "^1.1.1",
     "thepiratebay": "^1.1.8",
+    "throttle": "^1.0.3",
     "torrent-stream": "^1.0.3"
   },
   "scripts": {

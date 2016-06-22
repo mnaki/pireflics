@@ -5,7 +5,12 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-const _ = require('lodash')
+const _             = require('lodash')
+const fs            = require("fs-extra");
+const torrentStream = require('torrent-stream');
+const throttle      = require('throttle');
+
+const videoFormat   = ["mkv", "avi", "mp4", "ogg", "webm", "wmv"]
 
 module.exports = {
     /**
@@ -73,6 +78,12 @@ module.exports = {
              } else {
                 var torrent = results[0];
 
+
+                if (torrent.download) {
+                    res.json({ error: "already downloaded" });
+                    return ;
+                }
+
                  // start the download
                 var engine = torrentStream(torrent.magnet);
 
@@ -104,7 +115,7 @@ module.exports = {
                         sails.log.debug("TorrentController | download | File choosen for torrent " + torrent.id + " is " + target.name);
 
                         var stream = target.createReadStream();
-                        var path = process.cwd() + '/.tmp/public/videos/' + torrent.id + '/';
+                        var path = process.cwd() + '/.tmp/private/videos/' + torrent.id + '/';
 
                         // make the folders that will receive the torrent file
                         fs.mkdirs(path, function (err) {
@@ -113,16 +124,14 @@ module.exports = {
                             else {
                                 // update with the torrent path
                                 torrent.path = '/videos/' + torrent.id + '/' + target.name;
+                                torrent.size = target.length;
                                 torrent.save();
                                 
                                 // send the model with the path
                                 res.ok(torrent.toJSON());
 
-                                var writer = fs.createWriteStream(path + '/' + hash);
-
-                                stream.on('data', function (data) {
-                                    writer.write(data);
-                                });
+                                var writer = fs.createWriteStream(path + '/' + target.name);
+                                stream.pipe(new throttle(10000000)).pipe(writer);
 
                                 stream.on('end', function () {
                                     sails.log.debug("TorrentController | download | Download of torrent " + torrent.id + " is finished");
@@ -135,6 +144,50 @@ module.exports = {
                 });
              }
         });
+    },
+
+    /**
+    *   `TorrentController.stream()`
+    *   /torrent/:id/stream
+    *
+    *   Route used to start the download of a torrent that has been prevsiouly crawled
+    */
+    stream: function (req, res) {
+        Torrent.find({ id: req.params.id }).exec(function ( err, results ) {
+             // check if we found the torrent to start the download
+             if ( err || results.length == 0) {
+                 res.notFound();
+             } else {
+                var torrent = results[0];
+
+                var path = process.cwd() + '/.tmp/private' + torrent.path;
+                var total = torrent.size;
+
+                if (req.headers['range']) {
+                    var parts = req.headers.range.replace(/bytes=/, "").split("-");
+
+                    var start = parseInt(parts[0], 10);
+                    var tmp = start + 1000000 - 1;
+                    var end = tmp;
+                    var chunksize = (end-start)+1;
+                    console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
+
+                    var file = fs.createReadStream(path, {start: start, end: end});
+                    res.writeHead(206, { 
+                        'Content-Range': 'bytes ' + start + '-' + end + '/' + total, 
+                        'Accept-Ranges': 'bytes', 
+                        'Content-Length': chunksize, 
+                        'Content-Type': 'video/mp4' 
+                    });
+                    file.pipe(res);
+                } else {
+                    console.log('ALL: ' + torrent.size);
+                    res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4' });
+                    fs.createReadStream(path).pipe(res);
+                }
+             }
+        });
     }
+
 };
 

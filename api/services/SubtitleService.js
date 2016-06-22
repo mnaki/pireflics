@@ -30,7 +30,7 @@ module.exports = {
             // if we found a subtitle for this lang
             if (subtitles[lang] !== undefined) {
 
-                var path = process.cwd() + '/.tmp/public/videos/' + torrent.id + '/';
+                var path = process.cwd() + '/.tmp/private/videos/' + torrent.id + '/';
 
                 fs.mkdirs(path, function ( err ) {
                     if (err)

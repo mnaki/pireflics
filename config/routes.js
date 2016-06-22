@@ -46,6 +46,9 @@ module.exports.routes = {
   // Download a torrent
   'get /torrent/:id/download': 'TorrentController.download',
 
+  // Stream a torrent
+  'get /torrent/:id/stream': 'TorrentController.stream',
+
   // Search a subtitle for this torrent
   'get /torrent/:id/subtitle/:lang': 'SubtitleController.search'
 

@@ -9,7 +9,7 @@ const kickass   = require('kickass-api');
 const piratebay = require('thepiratebay');
 const ptn       = require('parse-torrent-name');
 const async2 	= require("async");
-const bytes	    = require("bytes");
+const bytes2	    = require("bytes2");
 
 module.exports = {
 
@@ -95,14 +95,6 @@ module.exports = {
 
 		// parse info from name
 		returned.info = ptn(returned.info);
-
-		// prettify size if from kickass
-		if (torrent.source == "piratebay") {
-            console.log(torrent.size);
-            console.log(torrent.size.replace('i', '').toLowerCase());
-            returned.size = bytes.parse(torrent.size.replace('i', ''));
-        }
-       		
 
         // and return the torrent with all data inside
         callback(false, returned);
