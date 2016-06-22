@@ -17,7 +17,8 @@ var paginate = function (list, page, itemPerPage) {
 module.exports = {
 	popular: function (req, res) {
 		client.popularMovies(function(err, movies) {
-			// movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
+			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
+			sails.log.info(movies)
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);
 		});

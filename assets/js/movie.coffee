@@ -1,38 +1,38 @@
 currentPage = 1
-itemPerPage = 50
+itemPerPage = 5
 
 window.onload = ->
   populateList = (movies) ->
     $.each movies, (key, val) ->
-      # console.log val
       $.ajax
         url: '/movie/partial'
-        data: data: val
+        data: { page: currentPage, itemPerPage: itemPerPage, data: val }
         success: (partialData) ->
           $('.video-list').append partialData
 
   search = (searchText) ->
+    if $('.searchform .movieName').val() == ''
+      $.getJSON '/movie/popular', { page: currentPage, itemPerPage: itemPerPage}, (movies) ->
+        populateList movies
     $.getJSON '/movie/search/' + searchText, { page: currentPage, itemPerPage: itemPerPage}, (movies) ->
       # console.log(movies)
       populateList movies
-
 
   $('.searchform').submit (e) ->
     currentPage = 1
     itemPerPage = 5
     $('.video-list').html ''
-    $textBox = $('.searchform .movieName')
-    # console.log $textBox.val()
-    search $textBox.val()
+    search $('.searchform .movieName').val()
     return false
 
-  $.getJSON '/movie/popular', (movies) ->
-    # console.log(movies)
-    $('.video-list').html ''
-    populateList movies
+  @nextPage = ->
+    currentPage = currentPage + 1
+    search $('.searchform .movieName').val()
 
-  $(window).scroll ->
-    if $(window).scrollTop() + $(window).height() > $(document).height() - 5
+  $(window).scroll _.throttle(->
+    if $(window).scrollTop() + $(window).height() > $(document).height() - 100
       console.log 'bottom'
-      currentPage = currentPage + 1
-      search $('.searchform .movieName').val()
+      nextPage()
+  , 2000, trailing: false)
+
+  search()
