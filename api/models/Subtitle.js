@@ -18,8 +18,7 @@ module.exports = {
       },
       // the torrent of the subtitle
       torrent: {
-          model: 'torrent',
-          unique: true
+          model: 'torrent'
       }
   }
 };

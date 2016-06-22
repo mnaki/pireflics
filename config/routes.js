@@ -47,7 +47,7 @@ module.exports.routes = {
   'get /torrent/:id/download': 'TorrentController.download',
 
   // Search a subtitle for this torrent
-  'get /torrent/:id/subtitles/search/:lang': 'SubtitleController.search'
+  'get /torrent/:id/subtitle/:lang': 'SubtitleController.search'
 
   /***************************************************************************
   *                                                                          *

@@ -8,7 +8,7 @@
 module.exports = {
     /**
     *   `SubtitleController.search()`
-    *   /torrent/:id/search/:lang
+    *   /torrent/:id/subtitle/:lang
     *
     *   Route used to search a subtitle for a specific torrent
     */
@@ -24,11 +24,12 @@ module.exports = {
 
                 // if there is no subtitles, we can already search it
                 if (torrent.subtitles.length == 0) {
-                    var subtitle = SubtitleService.search(torrent, lang);
-                    if (subtitle == null)
-                        res.json({ error: "Subtitle not found for this torrent" });
-                    else 
-                        res.ok(subtitle);
+                    var subtitle = SubtitleService.search(torrent, lang, function ( err, results) {
+                        if (err)
+                            res.json(err);
+                        else 
+                            res.json(results);
+                    });
                 } 
                 // else just return our subtitle
                 else
