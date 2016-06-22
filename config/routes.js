@@ -20,6 +20,8 @@
  * http://sailsjs.org/#!/documentation/concepts/Routes/RouteTargetSyntax.html
  */
 
+var passport = require('passport');
+
 module.exports.routes = {
 
   /***************************************************************************
@@ -35,15 +37,22 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
-  'get /login': {
+
+  '/auth/login': {
     view: 'user/connexion'
   },
 
-  'post /login': 'AuthController.login',
+  'post /auth/login': 'AuthController.login',
 
-  '/logout': 'AuthController.logout',
+  // Cette route là va rediriger l'utilisateur sur facebook
+  '/auth/facebook': passport.authenticate('facebook', { scope: ['public_profile','email'] }),
 
-  'get /signup': {
+  // Celle-ci va être call après facebook
+  '/auth/facebook/callback': 'AuthController.facebook',
+
+  '/auth/logout': 'AuthController.logout',
+
+  'get /auth/signup': {
     view: 'user/register'
   },
 

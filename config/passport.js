@@ -1,7 +1,7 @@
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy;
-    bcrypt = require('bcrypt');
+    bcrypt = require('bcryptjs');
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -16,12 +16,19 @@ passport.deserializeUser(function(id, done) {
 passport.use(new FacebookStrategy({
         clientID: 1740667796150987,
         clientSecret: '28007b588dca84fb8b51a11f4cc26a35',
-        callbackURL: "/auth/facebook/callback"
+        callbackURL: "/auth/facebook/callback",
+		profileFields: ['id', 'displayName', 'name', 'emails']
     },
     function(accessToken, refreshToken, profile, done) {
-        console.log(profile);
-        User.findOrCreate({ email: profile.email }, function(err, user) {
+		// handle register via facebook
+        User.findOrCreate({ email: profile.emails[0].value }, function(err, user) {
             if (err) { return done(err); }
+
+			// if we created it, just update the name from facebook
+			user.lastname = profile.name.familyName;
+			user.firstname = profile.name.givenName;
+			user.save();
+
             done(null, user);
         });
     }

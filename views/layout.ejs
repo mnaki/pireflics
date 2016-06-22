@@ -28,7 +28,7 @@
           <ul class="nav navbar-nav">
             <% if(req.session.user == null){ %>
               <li>
-                <a href="/login">Connexion</a>
+                <a href="/auth/login">Connexion</a>
               </li>
             <% } else { %>
               <li>
@@ -45,7 +45,7 @@
                 </a>
                 <ul class="dropdown-menu">
                   <li><a href="#">- Mon profil</a></li>
-                  <li><a href="/logout">- Me déconnecter</a></li>
+                  <li><a href="/auth/logout">- Me déconnecter</a></li>
                 </ul>
               </li>
             <% } %>

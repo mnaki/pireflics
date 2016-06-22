@@ -18,7 +18,6 @@ module.exports = {
 
         passport.authenticate('local', function(err, user, info) {
             if ((err) || (!user)) {
-                //res.redirect('/login');
                 return res.send({
                     message: info.message,
                     user: user
@@ -26,9 +25,30 @@ module.exports = {
             }
             req.logIn(user, function(err) {
                 if (err) res.send(err);
+
                 req.session.user = user;
-                console.log(user);
                 res.redirect('/');
+            });
+        })(req, res);
+    },
+
+	facebook: function(req, res) {
+        passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/auth/login', scope: ['public_profile','email']}, function(err, user, info) {
+            if (err || !user) {
+				// handle error 
+                return res.send({
+                    err: err,
+                    info: info,
+                    user: user
+                });
+            }
+
+			// login via passport
+            req.logIn(user, function(err) {
+                if (err)
+                    return res.send(err);
+				req.session.user = user;
+                return res.redirect('/');
             });
         })(req, res);
     },

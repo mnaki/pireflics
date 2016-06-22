@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 module.exports = {
 
@@ -16,36 +16,34 @@ module.exports = {
       unique: true
     },
     password: {
-      type: 'string',
-      minLength: 6,
-      required: true
+      type: 'string'
     },
     firstname: {
-      type: 'string',
-      required: true
+      type: 'string'
     },
     lastname: {
-      type: 'string',
-      required: true
-    },
-    toJSON: function() {
-      var obj = this.toObject();
-      delete obj.password;
-      return obj;
+      type: 'string'
     }
   },
+
   beforeCreate: function(user, cb) {
-    bcrypt.genSalt(10, function(err, salt) {
-      bcrypt.hash(user.password, salt, function(err, hash) {
-        if (err) {
-          console.log(err);
-          cb(err);
-        } else {
-          user.password = hash;
-          cb();
-        }
-      });
-    });
+	// if he log via facebook, dont hash the password
+	if (user.password == undefined || user.password.length == 0)
+		cb();
+	// if its local strategy, hash it
+	else {
+		bcrypt.genSalt(10, function(err, salt) {
+			bcrypt.hash(user.password, salt, function(err, hash) {
+				if (err) {
+					console.log(err);
+					cb(err);
+				} else {
+					user.password = hash;
+					cb();
+				}
+			});
+		});
+	}
   }
 };
 
