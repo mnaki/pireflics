@@ -26,7 +26,10 @@ module.exports = {
     },
     default_language:{
         type: 'string',
-        default: 'En'
+        defaultsTo: 'En'
+    },
+    image : {
+        type: 'url'
     }
   },
 

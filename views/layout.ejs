@@ -54,6 +54,9 @@
       </div>
     </div>
     <div class="container">
+      <%if (req.session.msg){%>
+      <%= req.session.msg %>
+      <%req.session.msg = null }%>
     <%- body %>
 
     </div>

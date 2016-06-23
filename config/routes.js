@@ -62,7 +62,11 @@ module.exports.routes = {
     view: 'user/register'
   },
   
-  '/my_profil': 'UserController.my_profil'
+  '/my_profil': 'UserController.my_profil',
+
+  '/update_picture' : 'UserController.edit_picture',
+
+  '/update_info' : 'Usercontroller.edit_info'
 
   
 /***************************************************************************

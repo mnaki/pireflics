@@ -24,7 +24,7 @@
                 <h4 class="modal-title">Ajouter une photo</h4>
             </div>
             <div class="modal-body">
-                <form enctype="multipart/form-data" method="post" action="#">
+                <form method="post" action="/update_picture">
                     <input type="url" name="picture" class="form-control" placeholder="http://exemple.com/exemple.jpeg">
             </div>
             <div class="modal-footer">
@@ -44,11 +44,11 @@
                 <h4 class="modal-title">Modifier mes informations</h4>
             </div>
             <div class="modal-body">
-                <form method="post" action="<?= $this->base_url()?>user/edit_profil">
+                <form method="post" action="/update_info">
                     <label>Firstname :</label>
-                    <input name="prenom" value="<%= req.session.user['firstname'] %>" type="text" class="form-control input-sm" placeholder="Jacky">
+                    <input name="firstname" value="<%= req.session.user['firstname'] %>" type="text" class="form-control input-sm" placeholder="Jacky">
                     <label>Lastname :</label>
-                    <input name="nom"  value="<%= req.session.user['lastname'] %>" type="text" class="form-control input-sm" placeholder="Dupond">
+                    <input name="lastname"  value="<%= req.session.user['lastname'] %>" type="text" class="form-control input-sm" placeholder="Dupond">
                     <label>Email :</label>
                     <input name="email"  value="<%= req.session.user['email'] %>" type="email" class="form-control input-sm" placeholder="jdupond@mail.com">
             </div>
