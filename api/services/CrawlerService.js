@@ -9,7 +9,7 @@ const kickass   = require('kickass-api');
 const piratebay = require('thepiratebay');
 const ptn       = require('parse-torrent-name');
 const async2 	= require("async");
-const bytesize	= require("byte-size");
+const bytes2	    = require("bytes2");
 
 module.exports = {
 
@@ -24,6 +24,7 @@ module.exports = {
         function(callback){
             kickass.search({
                 query: name,
+                category: 'movies',
                 sort_by: 'seeders',
                 order: 'desc',
                 language: 'en'
@@ -44,7 +45,7 @@ module.exports = {
         // search via piratebay api
         function(callback) {
             piratebay.search(name, {
-                category: 'all',
+                category: 'video',
                 filter: {
                     verified: false  
                 },
@@ -94,10 +95,6 @@ module.exports = {
 
 		// parse info from name
 		returned.info = ptn(returned.info);
-
-		// prettify size if from kickass
-		if (torrent.source == "kickass")
-       		returned.size = bytesize(torrent.size, { units: 'iec' });
 
         // and return the torrent with all data inside
         callback(false, returned);

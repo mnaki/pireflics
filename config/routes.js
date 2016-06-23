@@ -35,10 +35,27 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
-  'get /torrent': 'TorrentController.search',
+
+  // Movie Controller
   'get /movie': 'MovieController.main',
   'get /movie/partial': 'MovieController.partial',
   'get /movie/search/:name': 'MovieController.search',
+
+  '/player': {
+    view: 'player'
+  },
+
+  // Search a torrent
+  'get /torrent/search/:name': 'TorrentController.search',
+  
+  // Download a torrent
+  'get /torrent/:id/download': 'TorrentController.download',
+
+  // Stream a torrent
+  'get /torrent/:id/stream': 'TorrentController.stream',
+
+  // Search a subtitle for this torrent
+  'get /torrent/:id/subtitle/:lang': 'SubtitleController.search'
 
   /***************************************************************************
   *                                                                          *
