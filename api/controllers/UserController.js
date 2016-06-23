@@ -6,6 +6,13 @@
  */
 
 module.exports = {
+    
+    my_profil : function (req, res){
+        if(req.user)
+            res.view('user/my_profil');
+        else
+            res.redirect('/auth/login');
+    }
 	
 };
 

@@ -45,8 +45,9 @@ module.exports.routes = {
   'post /auth/login': 'AuthController.login',
 
   // Cette route là va rediriger l'utilisateur sur facebook
-  '/auth/facebook': passport.authenticate('facebook', { scope: ['public_profile','email'] }),
-  
+  '/auth/facebook': passport.authenticate('facebook', { scope: ['public_profile', 'email'] }),
+
+  // Cette route là va rediriger l'utilisateur sur l'intra de 42
   '/auth/duoquadra': passport.authenticate('oauth2'),
 
   // Celle-ci va être call après facebook
@@ -60,9 +61,10 @@ module.exports.routes = {
   'get /auth/signup': {
     view: 'user/register'
   },
+  
+  '/my_profil': 'UserController.my_profil'
 
-
-
+  
 /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

@@ -23,6 +23,10 @@ module.exports = {
     },
     lastname: {
       type: 'string'
+    },
+    default_language:{
+        type: 'string',
+        default: 'En'
     }
   },
 

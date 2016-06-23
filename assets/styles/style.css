@@ -39,20 +39,9 @@ a{
 #logo{
     max-width: 45px;
 }
-.other-pics{
-    max-width: 100px;
-}
-.mini-circle{
-    max-width: 40px;
-}
-.photo_profil{
-    max-width: 150px;
-}
-.tuile{
-    max-height: 200px;
-}
-.thumbnail{
-    height: 355px;
+.icon{
+    max-width: 30px;
+    margin-right: 5px;
 }
 .red{
     color: red;
@@ -81,10 +70,4 @@ a{
 }
 .no-link{
     color: #333;
-}
-.pac-container{
-    z-index: 1050;
-}
-.pac-logo::after{
-    display: none;
 }
