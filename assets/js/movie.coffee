@@ -33,6 +33,6 @@ window.onload = ->
     if $(window).scrollTop() + $(window).height() > $(document).height() - 100
       console.log 'bottom'
       nextPage()
-  , 2000, trailing: false)
+  , 500, trailing: true)
 
   search()
