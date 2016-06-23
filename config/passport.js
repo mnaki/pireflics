@@ -2,7 +2,8 @@ var passport            = require('passport'),
     LocalStrategy       = require('passport-local').Strategy,
     FacebookStrategy    = require('passport-facebook').Strategy,
     OAuth2Strategy      = require('passport-oauth2').Strategy,
-    bcrypt              = require('bcryptjs');
+    bcrypt              = require('bcryptjs'),
+    request             = require('request');;
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -26,8 +27,8 @@ passport.use(new FacebookStrategy({
             if (err) { return done(err); }
 
 			// if we created it, just update the name from facebook
-			user.lastname = profile.name.familyName;
 			user.firstname = profile.name.givenName;
+			user.lastname = profile.name.familyName;
 			user.save();
 
             done(null, user);
@@ -43,8 +44,37 @@ passport.use(new OAuth2Strategy({
     callbackURL: "http://localhost:1337/auth/duoquadra/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    console.log(profile);
-    done({ lol : "toto" });
+
+    var options = {
+        url: 'https://api.intra.42.fr/v2/me',
+        headers: {
+            'Authorization': 'Bearer ' + accessToken
+        }
+    };
+
+    request(options, function ( error, response, body ) {
+        if (!error && response.statusCode == 200) {
+
+            body = JSON.parse(body);
+            
+            User.findOrCreate({ email: body.email }, function(err, user) {
+                if (err) { return done(err); }
+
+                // if we created it, just update the name from api
+                var tmp = body.displayname.split(' ');
+                user.firstname = tmp[0];
+                user.lastname = tmp[1];
+                user.save();
+
+                done(null, user);
+            });
+        } else {
+            done({ error : "cant retrieve /me from 42 api" });
+        }
+    });
+
+    
+    
   }
 ));
 
