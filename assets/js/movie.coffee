@@ -1,5 +1,6 @@
 currentPage = 1
 itemPerPage = 5
+currentSearch = ''
 
 window.onload = ->
   populateList = (movies) ->
@@ -33,6 +34,15 @@ window.onload = ->
     if $(window).scrollTop() + $(window).height() > $(document).height() - 100
       console.log 'bottom'
       nextPage()
+  , 500, trailing: true)
+
+  $('.searchform .movieName').keyup _.throttle(->
+    if $('.searchform .movieName').val() == currentSearch
+      return
+    currentSearch = $('.searchform .movieName').val()
+    console.log 'change'
+    $('.video-list').html ''
+    $('.searchform .movieName').submit()
   , 500, trailing: true)
 
   search()
