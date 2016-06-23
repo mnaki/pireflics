@@ -20,6 +20,8 @@
  * http://sailsjs.org/#!/documentation/concepts/Routes/RouteTargetSyntax.html
  */
 
+var passport = require('passport');
+
 module.exports.routes = {
 
   /***************************************************************************
@@ -55,9 +57,40 @@ module.exports.routes = {
   'get /torrent/:id/stream': 'TorrentController.stream',
 
   // Search a subtitle for this torrent
-  'get /torrent/:id/subtitle/:lang': 'SubtitleController.search'
+  'get /torrent/:id/subtitle/:lang': 'SubtitleController.search',
 
-  /***************************************************************************
+  '/auth/login': {
+    view: 'user/connexion'
+  },
+
+  'post /auth/login': 'AuthController.login',
+
+  // Cette route là va rediriger l'utilisateur sur facebook
+  '/auth/facebook': passport.authenticate('facebook', { scope: ['public_profile', 'email'] }),
+
+  // Cette route là va rediriger l'utilisateur sur l'intra de 42
+  '/auth/duoquadra': passport.authenticate('oauth2'),
+
+  // Celle-ci va être call après facebook
+  '/auth/facebook/callback': 'AuthController.facebook',
+
+  // Celle ci va etre call apres l'api de l'intra
+  '/auth/duoquadra/callback': 'AuthController.duoquadra',
+
+  '/auth/logout': 'AuthController.logout',
+
+  'get /auth/signup': {
+    view: 'user/register'
+  },
+  
+  '/my_profil': 'UserController.my_profil',
+
+  '/update_picture' : 'UserController.edit_picture',
+
+  '/update_info' : 'Usercontroller.edit_info'
+
+  
+/***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
   *                                                                          *
