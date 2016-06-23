@@ -42,14 +42,11 @@ module.exports.routes = {
   'get /movie': 'MovieController.main',
   'get /movie/partial': 'MovieController.partial',
   'get /movie/search/:name': 'MovieController.search',
-
-  '/player': {
-    view: 'player'
-  },
+  'get /movie/play/:id': 'MovieController.play',
 
   // Search a torrent
   'get /torrent/search/:name': 'TorrentController.search',
-  
+
   // Download a torrent
   'get /torrent/:id/download': 'TorrentController.download',
 
@@ -82,14 +79,14 @@ module.exports.routes = {
   'get /auth/signup': {
     view: 'user/register'
   },
-  
+
   '/my_profil': 'UserController.my_profil',
 
   '/update_picture' : 'UserController.edit_picture',
 
   '/update_info' : 'Usercontroller.edit_info'
 
-  
+
 /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

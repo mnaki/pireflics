@@ -7,6 +7,7 @@
 
 var TheMovieDb = require('themoviedb');
 var client = new TheMovieDb('67493736c8511d59d83f70c4b88a72f6');
+var get = require('get');
 
 var paginate = function (list, page, itemPerPage) {
 	page = page || 1;
@@ -39,5 +40,18 @@ module.exports = {
 	partial: function (req, res) {
 		sails.log.debug(req.param('data'));
 		return res.view('movie/partial', { layout: false, data: req.param('data') });
+	},
+
+	play: function (req, res) {
+		// http://api.themoviedb.org/3/movie/68735?api_key=67493736c8511d59d83f70c4b88a72f6
+		// return res.view('movie/play', { video: movie });
+		var url = 'http://api.themoviedb.org/3/movie/'+req.param('id')+'?api_key=67493736c8511d59d83f70c4b88a72f6';
+		sails.log.debug(url);
+		get(url).asBuffer(function(err, data) {
+			if (err) throw err;
+			var movie = JSON.parse(data);
+			sails.log.debug(movie);
+			return res.view('movie/play', { video: movie });
+		});
 	}
 };
