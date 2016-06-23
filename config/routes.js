@@ -46,9 +46,14 @@ module.exports.routes = {
 
   // Cette route là va rediriger l'utilisateur sur facebook
   '/auth/facebook': passport.authenticate('facebook', { scope: ['public_profile','email'] }),
+  
+  '/auth/duoquadra': passport.authenticate('oauth2'),
 
   // Celle-ci va être call après facebook
   '/auth/facebook/callback': 'AuthController.facebook',
+
+  // Celle ci va etre call apres l'api de l'intra
+  '/auth/duoquadra/callback': 'AuthController.duoquadra',
 
   '/auth/logout': 'AuthController.logout',
 

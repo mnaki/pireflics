@@ -53,6 +53,27 @@ module.exports = {
         })(req, res);
     },
 
+    duoquadra: function(req, res) {
+        passport.authenticate('oauth2', { successRedirect: '/', failureRedirect: '/auth/login', scope: ['public_profile','email']}, function(err, user, info) {
+            if (err || !user) {
+				// handle error 
+                return res.send({
+                    err: err,
+                    info: info,
+                    user: user
+                });
+            }
+
+			// login via passport
+            req.logIn(user, function(err) {
+                if (err)
+                    return res.send(err);
+				req.session.user = user;
+                return res.redirect('/');
+            });
+        })(req, res);
+    },
+
     logout: function(req, res) {
         req.session.user = null;
         req.logout();

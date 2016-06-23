@@ -1,7 +1,8 @@
-var passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
-    FacebookStrategy = require('passport-facebook').Strategy;
-    bcrypt = require('bcryptjs');
+var passport            = require('passport'),
+    LocalStrategy       = require('passport-local').Strategy,
+    FacebookStrategy    = require('passport-facebook').Strategy,
+    OAuth2Strategy      = require('passport-oauth2').Strategy,
+    bcrypt              = require('bcryptjs');
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -32,6 +33,19 @@ passport.use(new FacebookStrategy({
             done(null, user);
         });
     }
+));
+
+passport.use(new OAuth2Strategy({
+    authorizationURL: 'https://api.intra.42.fr/oauth/authorize',
+    tokenURL: 'https://api.intra.42.fr/oauth/token',
+    clientID: '24e1a4803e1b4a813bc22d4368cbf33b150ff32fad733a21d8855792b828f59c',
+    clientSecret: '5dc5d8ccc1e2d4ba3c2e832aa0986b3dc8ece637015dd6d6fe7306bc27397fc1',
+    callbackURL: "http://localhost:1337/auth/duoquadra/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    console.log(profile);
+    done({ lol : "toto" });
+  }
 ));
 
 passport.use(new LocalStrategy({
