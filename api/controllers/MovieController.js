@@ -18,7 +18,7 @@ var paginate = function (list, page, itemPerPage) {
 module.exports = {
 	popular: function (req, res) {
 		client.popularMovies(function(err, movies) {
-			if (err) return;
+			if (err) return res.send({});
 			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);
@@ -27,7 +27,7 @@ module.exports = {
 
 	search: function (req, res) {
 		client.searchMovies({query: req.param('name'), sortBy: 'popularity.desc'}, function (err, movies) {
-			if (err) return;
+			if (err) return res.send({});
 			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);
@@ -46,7 +46,7 @@ module.exports = {
 		// J'ai du utilise une requete HTTP ici au lieu du module nodejs TMDB a cause d'un bug dedans
 		var url = 'http://api.themoviedb.org/3/movie/'+req.param('id')+'?api_key=67493736c8511d59d83f70c4b88a72f6';
 		get(url).asBuffer(function(err, data) {
-			if (err) return;
+			if (err) return res.send({});
 			var movie = JSON.parse(data);
 			return res.view('movie/play', { video: movie });
 		});
