@@ -16,7 +16,12 @@ window.onload = ->
     if $('.searchform .movieName').val() == ''
       $.getJSON '/movie/popular', {page: currentPage, itemPerPage: itemPerPage}, (movies) ->
         populateList movies
-    $.getJSON '/movie/search/' + searchText, { sortBy: $('#sel1').val(),  page: currentPage, itemPerPage: itemPerPage}, (movies) ->
+    $.getJSON '/movie/search/' + searchText, {
+      sortBy: $('#order').val(),
+      order: $('#ascdesc').val(),
+      page: currentPage,
+      itemPerPage: itemPerPage
+      }, (movies) ->
       populateList movies
 
   $('.searchform').submit (e) ->
@@ -35,15 +40,15 @@ window.onload = ->
       nextPage()
   , 500, trailing: true)
 
-  @onUserInput = ->
-    if $('.searchform .movieName').val() == currentSearch && currentSort == $('#sel1').val()
-      return
+  onUserInput = ->
+    # if $('.searchform .movieName').val() == currentSearch && currentSort == $('#order').val()
+    #   return
     currentSearch = $('.searchform .movieName').val()
-    currentSort = $('#sel1').val()
+    currentSort = $('#order').val()
     $('.video-list').html ''
     $('.searchform .movieName').submit()
 
   $('.searchform .movieName').keyup _.throttle(onUserInput, 500, trailing: true)
-  $('#sel1').change onUserInput
+  $('.searchform').change onUserInput
 
   search()

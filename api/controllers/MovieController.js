@@ -8,6 +8,7 @@
 var TheMovieDb = require('themoviedb');
 var client = new TheMovieDb('67493736c8511d59d83f70c4b88a72f6');
 var get = require('get');
+var _ = require('lodash');
 
 var paginate = function (list, page, itemPerPage) {
 	page = page || 1;
@@ -30,12 +31,10 @@ module.exports = {
 			query: req.param('name'),
 			includeAdult: true
 		}
-		sails.log.debug('MovieController | search | searchParam = ' + JSON.stringify(searchParam));
 		client.searchMovies(searchParam, function (err, movies) {
 			if (err) return res.send({});
-			movies = _.sortBy(movies, function (m) {
-				return -m[req.param('sortBy')]
-			})
+			movies = _.sortBy(movies, req.param('sortBy') || 'popularity');
+			if (req.param('order') != 'desc') _.reverse(movies);
 			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);
