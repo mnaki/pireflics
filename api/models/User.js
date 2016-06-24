@@ -10,27 +10,29 @@ var bcrypt = require('bcryptjs');
 module.exports = {
 
   attributes: {
-    email: {
-      type: 'email',
-      required: true,
-      unique: true
-    },
-    password: {
-      type: 'string'
-    },
-    firstname: {
-      type: 'string'
-    },
-    lastname: {
-      type: 'string'
-    },
-    default_language:{
-        type: 'string',
-        defaultsTo: 'En'
-    },
-    image : {
-        type: 'url'
-    }
+      email: {
+          type: 'email',
+          required: true,
+          unique: true
+      },
+      password: {
+          type: 'string'
+      },
+      firstname: {
+          type: 'string',
+          required: true
+      },
+      lastname: {
+          type: 'string',
+          required: true
+      },
+      default_language:{
+          type: 'string',
+          defaultsTo: 'En'
+      },
+      image : {
+          type: 'url'
+      }
   },
 
   beforeCreate: function(user, cb) {

@@ -15,9 +15,9 @@ module.exports = {
     },
     edit_picture : function(req,res){
         if(req.user){
-            User.query('UPDATE `user` SET image="'+req.param('picture')+'"', function(err, results) {
+            User.update({ id : req.session.user.id }, { image : req.param('picture') }).exec(function afterupdate(err, updated){
                 if (err) return res.serverError(err);
-                req.session.user['image'] = req.param('picture');
+                req.session.user.image = req.param('picture');
                 res.redirect('user/my_profil');
             });
         }
@@ -26,6 +26,22 @@ module.exports = {
     },
     edit_info : function (req, res){
         if(req.user) {
+            User.update({ id : req.session.user.id }, { firstname : req.param('firstname'), lastname : req.param('lastname'), email : req.param('email') }).exec(function afterupdate(err, updated){
+                if (err){
+                    console.log(err.code);
+                    req.session.msg = err.code;
+                    res.redirect('user/my_profil');
+                }
+                else {
+                    req.session.user.lastname = req.param('lastname');
+                    req.session.user.firstname = req.param('firstname');
+                    req.session.user.email = req.param('email');
+                    res.redirect('user/my_profil');
+                }
+            });
+
+
+/*
             User.query('UPDATE `user` SET firstname="'+req.param('firstname') + '", lastname="' + req.param('lastname') + '", email="' + req.param('email') + '" WHERE id='+req.session.user['id'], function(err, results) {
                 if (err){
                     console.log(err['code']);
@@ -39,6 +55,7 @@ module.exports = {
                     res.redirect('user/my_profil');
                 }
             });
+            */
         }
         else
             res.redirect('/auth/login');
