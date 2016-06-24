@@ -166,6 +166,7 @@ module.exports = {
             // if the torrent is not already download, get the engine stream
             else if (!results[0].download) {
                 var torrent = results[0];
+                sails.log.debug("TorrentController | stream | Streaming torrent " + torrent.id + " directly from stream");
 
                 if (engines[torrent.id] === undefined) {
                     return res.json({ err: "please retry " });
@@ -195,6 +196,7 @@ module.exports = {
              // if the file is download, just stream the content
              else {
                 var torrent = results[0];
+                sails.log.debug("TorrentController | stream | Streaming torrent " + torrent.id + " from cached file");
 
                 var path = process.cwd() + '/.tmp/private' + torrent.path;
 
