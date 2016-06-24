@@ -12,6 +12,9 @@ const throttle      = require('throttle');
 
 const videoFormat   = ["mkv", "avi", "mp4", "ogg", "webm", "wmv"]
 
+// used to store the engine already running to download file
+var engines = {};
+
 module.exports = {
     /**
     *   `TorrentController.search()`
@@ -116,6 +119,8 @@ module.exports = {
 
                         var stream = target.createReadStream();
                         var path = process.cwd() + '/.tmp/private/videos/' + torrent.id + '/';
+                        // store the torrent instance
+                        engines[torrent.id] = target;
 
                         // make the folders that will receive the torrent file
                         fs.mkdirs(path, function (err) {
@@ -154,35 +159,62 @@ module.exports = {
     */
     stream: function (req, res) {
         Torrent.find({ id: req.params.id }).exec(function ( err, results ) {
-             // check if we found the torrent to start the download
-             if ( err || results.length == 0) {
-                 res.notFound();
-             } else {
+            // check if we found the torrent to start the download
+            if ( err || results.length == 0) {
+                return res.notFound();
+            }
+            // if the torrent is not already download, get the engine stream
+            else if (!results[0].download) {
+                var torrent = results[0];
+
+                if (engines[torrent.id] === undefined) {
+                    return res.json({ err: "please retry " });
+                } else {
+                    if (req.headers['range']) {
+                        var parts = req.headers.range.replace(/bytes=/, "").split("-");
+
+                        var start = parseInt(parts[0], 10);
+                        var end = torrent.size - 1;
+                        var chunksize = ( end - start ) + 1;
+
+                        var file = engines[torrent.id].createReadStream({start: start, end: end});
+                        res.writeHead(206, { 
+                            'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size, 
+                            'Accept-Ranges': 'bytes', 
+                            'Content-Length': chunksize, 
+                            'Content-Type': 'video/mp4' 
+                        });
+                        file.pipe(res);
+                    } else {
+                        res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': 'video/mp4' });
+                        engines[torrent.id].createReadStream().pipe(res);
+                    }
+                }
+
+             } 
+             // if the file is download, just stream the content
+             else {
                 var torrent = results[0];
 
                 var path = process.cwd() + '/.tmp/private' + torrent.path;
-                var total = torrent.size;
 
                 if (req.headers['range']) {
                     var parts = req.headers.range.replace(/bytes=/, "").split("-");
 
                     var start = parseInt(parts[0], 10);
-                    var tmp = start + 1000000 - 1;
-                    var end = tmp;
+                    var end = torrent.size - 1;
                     var chunksize = (end-start)+1;
-                    console.log('RANGE: ' + start + ' - ' + end + ' = ' + chunksize);
 
                     var file = fs.createReadStream(path, {start: start, end: end});
                     res.writeHead(206, { 
-                        'Content-Range': 'bytes ' + start + '-' + end + '/' + total, 
+                        'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size, 
                         'Accept-Ranges': 'bytes', 
                         'Content-Length': chunksize, 
                         'Content-Type': 'video/mp4' 
                     });
                     file.pipe(res);
                 } else {
-                    console.log('ALL: ' + torrent.size);
-                    res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4' });
+                    res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': 'video/mp4' });
                     fs.createReadStream(path).pipe(res);
                 }
              }
