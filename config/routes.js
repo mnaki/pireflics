@@ -61,12 +61,17 @@ module.exports.routes = {
   'get /auth/signup': {
     view: 'user/register'
   },
-  
+
+  '/lost_password': {
+    view: 'user/lost_password'
+  },
+  '/reset_pwd': 'UserController.reset_pwd',
+
   '/my_profil': 'UserController.my_profil',
 
   '/update_picture' : 'UserController.edit_picture',
 
-  '/update_info' : 'Usercontroller.edit_info'
+  '/update_info' : 'Usercontroller.edit_info',
 
   
 /***************************************************************************
