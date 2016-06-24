@@ -26,8 +26,16 @@ module.exports = {
 	},
 
 	search: function (req, res) {
-		client.searchMovies({query: req.param('name'), sortBy: 'popularity.desc'}, function (err, movies) {
+		var searchParam = {
+			query: req.param('name'),
+			includeAdult: true
+		}
+		sails.log.debug('MovieController | search | searchParam = ' + JSON.stringify(searchParam));
+		client.searchMovies(searchParam, function (err, movies) {
 			if (err) return res.send({});
+			movies = _.sortBy(movies, function (m) {
+				return -m[req.param('sortBy')]
+			})
 			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);

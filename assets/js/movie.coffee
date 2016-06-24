@@ -1,6 +1,7 @@
 currentPage = 1
 itemPerPage = 5
 currentSearch = ''
+currentSort = ''
 
 window.onload = ->
   populateList = (movies) ->
@@ -13,10 +14,9 @@ window.onload = ->
 
   search = (searchText) ->
     if $('.searchform .movieName').val() == ''
-      $.getJSON '/movie/popular', { page: currentPage, itemPerPage: itemPerPage}, (movies) ->
+      $.getJSON '/movie/popular', {page: currentPage, itemPerPage: itemPerPage}, (movies) ->
         populateList movies
-    $.getJSON '/movie/search/' + searchText, { page: currentPage, itemPerPage: itemPerPage}, (movies) ->
-      # console.log(movies)
+    $.getJSON '/movie/search/' + searchText, { sortBy: $('#sel1').val(),  page: currentPage, itemPerPage: itemPerPage}, (movies) ->
       populateList movies
 
   $('.searchform').submit (e) ->
@@ -32,17 +32,18 @@ window.onload = ->
 
   $(window).scroll _.throttle(->
     if $(window).scrollTop() + $(window).height() > $(document).height() - 100
-      console.log 'bottom'
       nextPage()
   , 500, trailing: true)
 
-  $('.searchform .movieName').keyup _.throttle(->
-    if $('.searchform .movieName').val() == currentSearch
+  @onUserInput = ->
+    if $('.searchform .movieName').val() == currentSearch && currentSort == $('#sel1').val()
       return
     currentSearch = $('.searchform .movieName').val()
-    console.log 'change'
+    currentSort = $('#sel1').val()
     $('.video-list').html ''
     $('.searchform .movieName').submit()
-  , 500, trailing: true)
+
+  $('.searchform .movieName').keyup _.throttle(onUserInput, 500, trailing: true)
+  $('#sel1').change onUserInput
 
   search()
