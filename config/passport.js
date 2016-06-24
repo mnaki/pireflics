@@ -23,15 +23,21 @@ passport.use(new FacebookStrategy({
     },
     function(accessToken, refreshToken, profile, done) {
 		// handle register via facebook
-        User.findOrCreate({ email: profile.emails[0].value }, function(err, user) {
-            if (err) { return done(err); }
-
-			// if we created it, just update the name from facebook
-			user.firstname = profile.name.givenName;
-			user.lastname = profile.name.familyName;
-			user.save();
-
-            done(null, user);
+        User.findOne({ email: profile.emails[0].value }, function(err, user) {
+            if (err) {return done(err);}
+            if(!user){
+                User.create({ email: profile.emails[0].value }, function(err, user) {
+                    if (err) { return done(err); }
+                    // if we created it, just update the name from facebook
+                    user.firstname = profile.name.givenName;
+                    user.lastname = profile.name.familyName;
+                    user.save();
+                    done(null, user);
+                });
+            }
+            else {
+                done(null, user);
+            }
         });
     }
 ));
@@ -56,17 +62,23 @@ passport.use(new OAuth2Strategy({
         if (!error && response.statusCode == 200) {
 
             body = JSON.parse(body);
-            
-            User.findOrCreate({ email: body.email }, function(err, user) {
-                if (err) { return done(err); }
 
-                // if we created it, just update the name from api
-                var tmp = body.displayname.split(' ');
-                user.firstname = tmp[0];
-                user.lastname = tmp[1];
-                user.save();
-
-                done(null, user);
+            User.findOne({ email: body.email }, function(err, user) {
+                if (err) {return done(err);}
+                if(!user){
+                    User.create({ email: body.email }, function(err, user) {
+                        if (err) { return done(err); }
+                        // if we created it, just update the name from api
+                        var tmp = body.displayname.split(' ');
+                        user.firstname = tmp[0];
+                        user.lastname = tmp[1];
+                        user.save();
+                        done(null, user);
+                    });
+                }
+                else {
+                    done(null, user);
+                }
             });
         } else {
             done({ error : "cant retrieve /me from 42 api" });
