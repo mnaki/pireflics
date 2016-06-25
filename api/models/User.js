@@ -16,7 +16,8 @@ module.exports = {
           unique: true
       },
       password: {
-          type: 'string'
+          type: 'string',
+          required: true
       },
       firstname: {
           type: 'string',
@@ -37,6 +38,7 @@ module.exports = {
 
   beforeCreate: function(user, cb) {
 	// if he log via facebook, dont hash the password
+      sails.log.debug(user);
 	if (user.password == undefined || user.password.length == 0)
 		cb();
 	// if its local strategy, hash it

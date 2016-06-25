@@ -39,27 +39,43 @@ module.exports = {
                     res.redirect('user/my_profil');
                 }
             });
-
-
-/*
-            User.query('UPDATE `user` SET firstname="'+req.param('firstname') + '", lastname="' + req.param('lastname') + '", email="' + req.param('email') + '" WHERE id='+req.session.user['id'], function(err, results) {
-                if (err){
-                    console.log(err['code']);
-                    req.session.msg = err['code'];
-                    res.redirect('user/my_profil');
-                }
-                else {
-                    req.session.user['lastname'] = req.param('lastname');
-                    req.session.user['firstname'] = req.param('firstname');
-                    req.session.user['email'] = req.param('email');
-                    res.redirect('user/my_profil');
-                }
-            });
-            */
         }
         else
             res.redirect('/auth/login');
+    },
+    reset_pwd: function(req, res) {
+        User.findOne({email: req.param('email')}).exec(function(err, user) {
+            if (err) {return done(err);}
+            sails.log.debug(user);
+            if(user.password == null){
+                req.session.msg = 'Vous n avez pas de mot de passe, connectez vous par l api habituel';
+                res.redirect('/auth/login');
+            }
+            else{
+                if(req.param('firstname') == user.firstname && req.param('lastname') == user.lastname){
+                    sails.hooks.email.send(
+                        "reset_password",
+                        {
+                            recipientName: req.param('firstname'),
+                            senderName: "Admin"
+                        },
+                        {
+                            to: "valentin.klepper@gmail.com",
+                            subject: "Hi there"
+                        },
+                        function(err) {console.log(err || "Email for reset password sended !");}
+                    );
+                    res.redirect('/reset_password');
+                }
+                else{
+                    req.session.msg = 'Mmmh, les informations ne concordent pas...';
+                    res.redirect('/reset_password');
+                }
+
+            }
+        });
     }
+
 	
 };
 

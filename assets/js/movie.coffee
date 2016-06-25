@@ -1,7 +1,5 @@
 currentPage = 1
 itemPerPage = 5
-currentSearch = ''
-currentSort = ''
 
 window.onload = ->
   populateList = (movies) ->
@@ -26,7 +24,6 @@ window.onload = ->
 
   $('.searchform').submit (e) ->
     currentPage = 1
-    itemPerPage = 5
     $('.video-list').html ''
     search $('.searchform .movieName').val()
     return false
@@ -38,17 +35,13 @@ window.onload = ->
   $(window).scroll _.throttle(->
     if $(window).scrollTop() + $(window).height() > $(document).height() - 100
       nextPage()
-  , 500, trailing: true)
+  , 1500, trailing: true)
 
   onUserInput = ->
-    # if $('.searchform .movieName').val() == currentSearch && currentSort == $('#order').val()
-    #   return
-    currentSearch = $('.searchform .movieName').val()
-    currentSort = $('#order').val()
     $('.video-list').html ''
     $('.searchform .movieName').submit()
 
-  $('.searchform .movieName').keyup _.throttle(onUserInput, 500, trailing: true)
+  $('.searchform .movieName').keyup _.throttle(onUserInput, 1500, trailing: true)
   $('.searchform').change onUserInput
 
   search()
