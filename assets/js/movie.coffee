@@ -12,11 +12,14 @@ window.onload = ->
 
   search = (searchText) ->
     if $('.searchform .movieName').val() == ''
+      $('select').each((i, e) -> $(e).attr('disabled', ''))
       $.getJSON '/movie/popular', {page: currentPage, itemPerPage: itemPerPage}, (movies) ->
         populateList movies
+    else
+      $('select').each((i, e) -> $(e).removeAttr('disabled'))
     $.getJSON '/movie/search/' + searchText, {
-      sortBy: $('#order').val(),
-      order: $('#ascdesc').val(),
+      sortBy: $('#sortby').val(),
+      order: $('#order').val(),
       page: currentPage,
       itemPerPage: itemPerPage
       }, (movies) ->
