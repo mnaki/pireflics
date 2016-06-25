@@ -9,8 +9,23 @@ const _             = require('lodash')
 const fs            = require("fs-extra");
 const torrentStream = require('torrent-stream');
 const throttle      = require('throttle');
+const Transcoder	= require('stream-transcoder');
 
-const videoFormat   = ["mkv", "avi", "mp4", "ogg", "webm", "wmv"]
+var mimeTypes = {
+	"f4v":		"video/mp4",
+	"f4p":		"video/mp4",
+	"mp4":		"video/mp4",
+	"mkv":		"video/matroska",
+	"avi":		"video/x-msvideo",
+	"mpa":		"video/mpeg",
+	"mpe":		"video/mpeg",
+	"mpeg":		"video/mpeg",
+	"mpg":		"video/mpeg",
+	"mpv2":		"video/mpeg",
+	"mp2":		"video/mpeg",
+	"webm":		"video/webm",
+	"ogg":		"video/ogg"
+};
 
 // used to store the engine already running to download file
 var engines = {};
@@ -99,7 +114,7 @@ module.exports = {
                         var ext = file.name.split(".").pop();
 
                         // if the file is not video or its a sample
-                        if (videoFormat.indexOf(ext) === -1 || file.name.indexOf("sample") !== -1) {
+                        if (mimeTypes[ext] === -1 || file.name.indexOf("sample") !== -1) {
                             callback()
                             return ;
                         }
@@ -119,6 +134,7 @@ module.exports = {
 
                         var stream = target.createReadStream();
                         var path = process.cwd() + '/.tmp/private/videos/' + torrent.id + '/';
+
                         // store the torrent instance
                         engines[torrent.id] = target;
 
@@ -127,20 +143,36 @@ module.exports = {
                             if (err)
                                 res.serverError(err);
                             else {
+								var ext = target.name.split('.').pop();
+
                                 // update with the torrent path
-                                torrent.path = '/videos/' + torrent.id + '/' + target.name;
+								torrent.path = '/videos/' + torrent.id + '/' + target.name;
                                 torrent.size = target.length;
+								torrent.mime = mimeTypes[ext]; 
                                 torrent.save();
                                 
                                 // send the model with the path
                                 res.ok(torrent.toJSON());
 
                                 var writer = fs.createWriteStream(path + '/' + target.name);
-                                stream.pipe(new throttle(10000000)).pipe(writer);
-
+								
+								// transcode if its mkv
+								if (ext == "mkv") 
+									new Transcoder(stream).format('mp4').stream().pipe(writer);
+								else 
+									stream.pipe(writer);
+                                
                                 stream.on('end', function () {
                                     sails.log.debug("TorrentController | download | Download of torrent " + torrent.id + " is finished");
                                     torrent.download = true;
+
+									// if the torrent has been transcoded, update linked data like size etc
+									if (ext == "mkv") {
+										fs.rename(path + '/' + target.name, path + '/' + target.name.replace(".mkv", ".mp4"));
+										torrent.path = torrent.path.replace(".mkv", ".mp4");
+										torrent.size = fs.statSync(torrent.path).size;
+									}
+
                                     torrent.save();
                                 });
                             }
@@ -171,6 +203,8 @@ module.exports = {
                 if (engines[torrent.id] === undefined) {
                     return res.json({ err: "please retry " });
                 } else {
+					var ext = torrent.path.split('.').pop();
+
                     if (req.headers['range']) {
                         var parts = req.headers.range.replace(/bytes=/, "").split("-");
 
@@ -179,15 +213,21 @@ module.exports = {
                         var chunksize = ( end - start ) + 1;
 
                         var file = engines[torrent.id].createReadStream({start: start, end: end});
+						var mime = ext == "mkv" ? "video/mp4" : torrent.mime;
+
                         res.writeHead(206, { 
                             'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size, 
                             'Accept-Ranges': 'bytes', 
-                            'Content-Length': chunksize, 
-                            'Content-Type': 'video/mp4' 
+                            'Content-Length': chunksize,
+                            'Content-Type': mime
                         });
-                        file.pipe(res);
+
+						if (ext == "mkv") 
+							new Transcoder(file).format('mp4').stream().pipe(res);
+						else 
+							stream.pipe(res);
                     } else {
-                        res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': 'video/mp4' });
+                        res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
                         engines[torrent.id].createReadStream().pipe(res);
                     }
                 }
@@ -212,11 +252,11 @@ module.exports = {
                         'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size, 
                         'Accept-Ranges': 'bytes', 
                         'Content-Length': chunksize, 
-                        'Content-Type': 'video/mp4' 
+                        'Content-Type': torrent.mime
                     });
                     file.pipe(res);
                 } else {
-                    res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': 'video/mp4' });
+                    res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
                     fs.createReadStream(path).pipe(res);
                 }
              }
