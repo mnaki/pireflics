@@ -52,6 +52,7 @@
     "sails-mysql": "^0.11.5",
     "srt-to-vtt": "^1.1.1",
     "themoviedb": "^0.1.0",
+    "stream-transcoder": "0.0.5",
     "thepiratebay": "^1.1.8",
     "throttle": "^1.0.3",
     "torrent-stream": "^1.0.3",
