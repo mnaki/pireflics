@@ -15,17 +15,17 @@ module.exports = {
           required: true,
           unique: true
       },
-      password: {
-          type: 'string',
-          required: true
+      pwd: {
+          type: 'string'
       },
       firstname: {
           type: 'string',
-          required: true
       },
       lastname: {
           type: 'string',
-          required: true
+      },
+      sexe:{
+          type : 'string'
       },
       default_language:{
           type: 'string',
@@ -38,18 +38,20 @@ module.exports = {
 
   beforeCreate: function(user, cb) {
 	// if he log via facebook, dont hash the password
-      sails.log.debug(user);
-	if (user.password == undefined || user.password.length == 0)
-		cb();
+	if (user.pwd == undefined || user.pwd.length == 0){
+        cb();
+    }
+
 	// if its local strategy, hash it
 	else {
-		bcrypt.genSalt(10, function(err, salt) {
-			bcrypt.hash(user.password, salt, function(err, hash) {
+        sails.log.debug('PWD define');
+        bcrypt.genSalt(10, function(err, salt) {
+			bcrypt.hash(user.pwd, salt, function(err, hash) {
 				if (err) {
 					console.log(err);
 					cb(err);
 				} else {
-					user.password = hash;
+					user.pwd = hash;
 					cb();
 				}
 			});

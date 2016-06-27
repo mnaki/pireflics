@@ -15,7 +15,7 @@ module.exports = {
     },
 
     login: function(req, res) {
-
+        sails.log.debug("Fuck you !!!");
         passport.authenticate('local', function(err, user, info) {
             if ((err) || (!user)) {
                 return res.send({

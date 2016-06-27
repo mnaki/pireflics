@@ -38,7 +38,7 @@ module.exports.routes = {
     view: 'homepage'
   },
 
-  '/auth/login': {
+  'get /auth/login': {
     view: 'user/connexion'
   },
 

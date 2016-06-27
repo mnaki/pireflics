@@ -6,6 +6,15 @@
  */
 
 module.exports = {
+
+    create: function(req, res) {
+        User.create(req.body).exec(function(err, result){
+            if (err) {
+                //Handle Error
+            }
+            return res.redirect('/auth/login')
+        });
+    },
     
     my_profil : function (req, res){
         if(req.user)
@@ -46,8 +55,7 @@ module.exports = {
     reset_pwd: function(req, res) {
         User.findOne({email: req.param('email')}).exec(function(err, user) {
             if (err) {return done(err);}
-            sails.log.debug(user);
-            if(user.password == null){
+            if(user.pwd == null){
                 req.session.msg = 'Vous n avez pas de mot de passe, connectez vous par l api habituel';
                 res.redirect('/auth/login');
             }
@@ -63,13 +71,14 @@ module.exports = {
                             to: "valentin.klepper@gmail.com",
                             subject: "Hi there"
                         },
-                        function(err) {console.log(err || "Email for reset password sended !");}
+                        function(err) {sails.log.debug(err || "Email for reset password sended !");}
                     );
-                    res.redirect('/reset_password');
+                    req.session.msg = 'You will receved an email to reset you password.';
+                    res.redirect('/auth/login');
                 }
                 else{
                     req.session.msg = 'Mmmh, les informations ne concordent pas...';
-                    res.redirect('/reset_password');
+                    res.redirect('/lost_password');
                 }
 
             }
