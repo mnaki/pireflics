@@ -34,7 +34,7 @@ module.exports = {
 		client.searchMovies(searchParam, function (err, movies) {
 			if (err) return res.send({});
 			movies = _.sortBy(movies, req.param('sortBy') || 'popularity');
-			if (req.param('order') != 'desc') _.reverse(movies);
+			if (req.param('order') == 'desc') _.reverse(movies);
 			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);

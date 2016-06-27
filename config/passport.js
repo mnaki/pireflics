@@ -85,8 +85,8 @@ passport.use(new OAuth2Strategy({
         }
     });
 
-    
-    
+
+
   }
 ));
 
@@ -101,14 +101,16 @@ passport.use(new LocalStrategy({
             if (!user) {
                 return done(null, false, { message: 'Incorrect email.' });
             }
-
-            bcrypt.compare(password, user.password, function (err, res) {
+            bcrypt.compare(password, user.pwd, function (err, res) {
                 if (!res)
                     return done(null, false, {
                         message: 'Invalid Password'
                     });
                 var returnUser = {
                     email: user.email,
+                    firstname : user.firstname,
+                    lastname : user.lastname,
+                    image : user.image,
                     createdAt: user.createdAt,
                     id: user.id
                 };

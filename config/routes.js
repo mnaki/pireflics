@@ -56,7 +56,7 @@ module.exports.routes = {
   // Search a subtitle for this torrent
   'get /torrent/:id/subtitle/:lang': 'SubtitleController.search',
 
-  '/auth/login': {
+  'get /auth/login': {
     view: 'user/connexion'
   },
 
