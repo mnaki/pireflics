@@ -52,8 +52,10 @@ module.exports = {
         else
             res.redirect('/auth/login');
     },
-    reset_pwd: function(req, res) {
+    send_reset_pwd: function(req, res) {
+
         User.findOne({email: req.param('email')}).exec(function(err, user) {
+
             if (err) {return done(err);}
             if(user.pwd == null){
                 req.session.msg = 'Vous n avez pas de mot de passe, connectez vous par l api habituel';
@@ -61,10 +63,14 @@ module.exports = {
             }
             else{
                 if(req.param('firstname') == user.firstname && req.param('lastname') == user.lastname){
+                    var token = Math.random()+'_'+user.email;
+                    Token.create({ token : token}).exec(function afterupdate(err, updated){if(err){sails.log.debug(err)}});
+                    token = new Buffer(token).toString('base64');
                     sails.hooks.email.send(
                         "reset_password",
                         {
                             recipientName: req.param('firstname'),
+                            tokenLink: token,
                             senderName: "Admin"
                         },
                         {
@@ -83,8 +89,45 @@ module.exports = {
 
             }
         });
-    }
+    },
+    reset_pwd: function (req, res) {
+        var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+        if(base64regex.test(req.param('token'))) {
 
-	
+            var token = new Buffer(req.param('token'), 'base64').toString('ascii');
+
+            Token.findOne({token : token}).exec(function(err, returnToken){
+
+                if(err){return sails.log.debug(err)};
+
+                if(!returnToken){
+                    req.session.msg = 'Not a valid token.';
+                    res.redirect('/auth/login');
+                }
+                else{
+                    var email = token.split('_');
+                    req.session.tmp_email = email[1];
+                    //Token.destroy({token : token}).exec(function(err, result){if(err){sails.log.debug(err)}})
+                    res.view('user/new_password');
+                }
+            })
+        }
+        else {
+            req.session.msg = 'Not a valid token.';
+            res.redirect('/auth/login');
+        }
+    },
+    new_pwd : function (req, res) {
+        var pwd = req.param('password');
+        bcrypt.hash(pwd, salt, function(err, hash) {
+            if (err) {
+                sails.log.debug(err);
+            } else {
+                pwd = hash;
+            }
+        });
+        User.update({email : req.session.tmp_email}, {pwd: req.param('password')}).exec(function (err, result){if(err){sails.log.debug(err)}})
+        res.redirect('/auth/login');
+    }
 };
 
