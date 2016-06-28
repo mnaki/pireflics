@@ -9,7 +9,7 @@
         <div class="img-block">
             <img src="<%= req.session.user['image'] != null ? req.session.user['image'] : '../images/defaultprofil.gif'%>" class="img-thumbnail">
         </div>
-        <button data-toggle="modal" data-target=".edit_avatar" class="btn">Ajouter une photo</button>
+        <button data-toggle="modal" data-target=".edit_avatar" class="btn"><%= __('Add one picture')%></button>
     </div>
 </div>
 
@@ -21,16 +21,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">Ajouter une photo</h4>
+                <h4 class="modal-title"><%= __('Add one picture')%></h4>
             </div>
-            <div class="modal-body">
-                <form method="post" action="/update_picture">
-                    <input type="url" name="picture" class="form-control" placeholder="http://exemple.com/exemple.jpeg">
-            </div>
-            <div class="modal-footer">
-                <input type="submit" value="Envoyer">
-                </form>
-            </div>
+            <form method="post" action="/update_picture">
+                <div class="modal-body">
+                        <input type="url" name="picture" class="form-control" placeholder="http://exemple.com/exemple.jpeg">
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" value="<%= __('Send')%>">
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -41,20 +41,20 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">Modifier mes informations</h4>
+                <h4 class="modal-title"><%= __('Edit info')%></h4>
             </div>
             <div class="modal-body">
                 <form method="post" action="/update_info">
-                    <label>Firstname :</label>
+                    <label><%= __('Firstname')%> :</label>
                     <input name="firstname" value="<%= req.session.user['firstname'] %>" type="text" class="form-control input-sm" placeholder="Jacky">
-                    <label>Lastname :</label>
+                    <label><%= __('Lastname')%> :</label>
                     <input name="lastname"  value="<%= req.session.user['lastname'] %>" type="text" class="form-control input-sm" placeholder="Dupond">
-                    <label>Email :</label>
+                    <label><%= __('Email')%> :</label>
                     <input name="email"  value="<%= req.session.user['email'] %>" type="email" class="form-control input-sm" placeholder="jdupond@mail.com">
             </div>
             <div class="modal-footer">
                 <div class="col-md-12 valider">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Send</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block"><%= __('Send')%></button>
                     </form>
                 </div>
             </div>

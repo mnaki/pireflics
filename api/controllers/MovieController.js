@@ -31,7 +31,7 @@ var sendCachedMovies = function (data, res) {
 			data.results,
 			cacheMovies,
 			function (err, movies) {
-				if (err) return res.json({});
+				if (err) return ;
 				res.json(_.omitBy(movies, function (o) {
 					return _.isNil(o.title);
 				}));
@@ -40,7 +40,7 @@ var sendCachedMovies = function (data, res) {
 	}
 	catch (e)
 	{
-		return res.json({});
+		return ;
 	}
 }
 
@@ -90,12 +90,9 @@ module.exports = {
 	},
 
 	play: function (req, res) {
-		// J'ai du utilise une requete HTTP ici au lieu du module nodejs TMDB a cause d'un bug dedans
-		var url = 'http://api.themoviedb.org/3/movie/'+req.param('id')+'?api_key='+api_key;
-		get(url).asBuffer(function(err, data) {
-			if (err) return res.send({});
-			var movie = JSON.parse(data);
-			return res.view('movie/play', { video: movie });
+		movie = Movie.find({id: req.param('id')}).exec(function (err, rec) {
+			if (err || rec.length == 0) return;
+			return res.view('movie/play', { video: movie[0] });
 		});
 	}
 };

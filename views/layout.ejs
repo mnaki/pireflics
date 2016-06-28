@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="fr">
+<html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8">
@@ -29,13 +29,13 @@
           <ul class="nav navbar-nav">
             <% if(req.session.user == null){ %>
               <li>
-                <a href="/auth/login">Connexion</a>
+                <a href="/auth/login"><%= __('Connexion')%></a>
               </li>
             <% } else { %>
               <li>
               </li>
               <li>
-                <a href="/movie">Recherche</a>
+                <a href="/movie/search"><%= __('Search')%></a>
               </li>
               <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -45,8 +45,8 @@
                   <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a href="/my_profil">- Mon profil</a></li>
-                  <li><a href="/auth/logout">- Me déconnecter</a></li>
+                  <li><a href="/my_profil">- <%= __('My profil')%></a></li>
+                  <li><a href="/auth/logout">- <%= __('Log out')%></a></li>
                 </ul>
               </li>
             <% } %>
