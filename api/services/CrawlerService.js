@@ -24,7 +24,6 @@ module.exports = {
         function(callback){
             kickass.search({
                 query: name,
-                category: 'movies',
                 sort_by: 'seeders',
                 order: 'desc',
                 language: 'en'
@@ -38,19 +37,19 @@ module.exports = {
                 // if we found nothing
                 else 
                     callback(true);
-            }).catch(function (error) {
+            }).catch(function ( error ) {
+                sails.log.debug("Error while crawling kickasstorrent : \n" + JSON.stringify(error));
             	callback(true);
             });
         },
         // search via piratebay api
         function(callback) {
             piratebay.search(name, {
-                category: 'video',
                 filter: {
                     verified: false  
                 },
                 orderBy: 'seeds',
-                sortBy: 'desc' 
+                sortBy: 'desc'
             })
             .then(function(response) {
                 // if we get a result return it
@@ -63,7 +62,8 @@ module.exports = {
                 else 
                     callback(true);
             })
-            .catch(function(err) {
+            .catch(function( error ) {
+                sails.log.debug("Error while crawling piratebay : \n" + JSON.stringify(error));
                 callback(true);
             })
         }
