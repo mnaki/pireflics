@@ -24,12 +24,9 @@ module.exports = {
       lastname: {
           type: 'string',
       },
-      sexe:{
-          type : 'string'
-      },
       default_language:{
           type: 'string',
-          defaultsTo: 'En'
+          defaultsTo: 'en'
       },
       image : {
           type: 'url'
