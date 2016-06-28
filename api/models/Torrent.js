@@ -39,6 +39,9 @@ module.exports = {
     path : {
         type: 'text'
     },
+	mime : {
+		type: 'string'
+	},
     // all of the subtitles that are linked to this torrent
     subtitles : {
       collection: 'subtitle',
