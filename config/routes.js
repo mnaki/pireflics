@@ -39,7 +39,7 @@ module.exports.routes = {
   },
 
   // Movie Controller
-  'get /movie': 'MovieController.main',
+  'get /movie/search': 'MovieController.search',
   'get /movie/partial': 'MovieController.partial',
   'get /movie/search/:name': 'MovieController.search',
   'get /movie/play/:id': 'MovieController.play',
