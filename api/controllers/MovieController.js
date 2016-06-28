@@ -81,7 +81,7 @@ module.exports = {
 	},
 
 	partial: function (req, res) {
-		return res.view('movie/partial', { layout: false, data: req.param('data') });
+		return res.view({ layout: false, data: req.param('data') });
 	},
 
 	play: function (req, res) {

@@ -1,33 +1,37 @@
-<form class="searchform" action="" method="get">
-	<div class="input-group">
-		<div class="input-group-btn">
-		<!-- Button and dropdown menu -->
-		<input type="submit" class="btn btn-default" name="submit" value="Go!">
+<div class="col-sm-12">
+
+	<form class="searchform" action="" method="get">
+		<div class="input-group">
+			<div class="input-group-btn">
+			<!-- Button and dropdown menu -->
+			<input type="submit" class="btn btn-default" name="submit" value="Go!">
+			</div>
+			<input class='movieName form-control' type="text" name="name" value="" placeholder="Warcraft" class="form-control" aria-label="movie-name">
 		</div>
-		<input class='movieName form-control' type="text" name="name" value="" placeholder="Warcraft" class="form-control" aria-label="movie-name">
+		<br>
+		<div class="form-group">
+			<label for="sortby"><%= __('Sort by') %> : </label>
+			<select class="form-control" id="sortby" disabled>
+				<option value="popularity"><%= __('Popularity')%></option>
+				<option value="title"><%= __('Name')%></option>
+				<option value="release"><%= __('Release date')%></option>
+				<option value="voteAverage"><%= __('Average rating')%></option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="order"><%= __('Order by')%> : </label>
+			<select class="form-control" id="order">
+				<option value="desc"><%= __('Descending')%></option>
+				<option value="asc"><%= __('Ascending')%></option>
+			</select>
+		</div>
 	</div>
-	<br>
-	<div class="form-group">
-		<label for="sortby">Trier par : </label>
-		<select class="form-control" id="sortby" disabled>
-			<option value="popularity">Popularité</option>
-			<option value="title">Nom</option>
-			<option value="release">Date de sortie</option>
-			<option value="voteAverage">Note moyenne</option>
-		</select>
+
+	<div class="row video-list">
 	</div>
-	<div class="form-group">
-		<label for="order">Ordre : </label>
-		<select class="form-control" id="order">
-			<option value="desc">Descendant</option>
-			<option value="asc">Croissant</option>
-		</select>
-	</div>
+
+	<script type="text/javascript" src='/js/movie.js'></script>
+
+	<a class='btn btn-default' href="javascript:nextPage()"><%= __('Next page')%></a>
+
 </div>
-
-<div class="row video-list">
-</div>
-
-<script type="text/javascript" src='/js/movie.js'></script>
-
-<a href="javascript:nextPage()">Next page</a>

@@ -19,7 +19,14 @@
 	"New password": "New password",
 	"Fields required": "Required fields",
 	"text loi": "Conformément à la loi n° 78-17 du 6 janvier 1978, relative à l'Informatique, aux Fichiers et aux Libertés,vous disposez d'un droit d'accès et de rectification des données à caractère personnel vous concernantet faisant l’objet de traitements sous la responsabilité du RSI. (ou pas vu que c'est un projet d'école, si tu met tesinfo perso pendant la correction, on en fera ce qu'il nous en plaira !)",
-	"Register": "Register"
-
-
+	"Register": "Register",
+	"Play": "Play",
+	"Sort by": "Sort by",
+	"Popularity": "Popularity",
+	"Name": "Name",
+	"Release date": "Release date",
+	"Average rating": "Average rating",
+	"Order by": "Order by",
+	"Descending": "Descending",
+	"Ascending": "Ascending"
 }
