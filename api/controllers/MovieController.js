@@ -9,36 +9,70 @@ var TheMovieDb = require('themoviedb');
 var client = new TheMovieDb('67493736c8511d59d83f70c4b88a72f6');
 var get = require('get');
 var _ = require('lodash');
-
+var api_key = '67493736c8511d59d83f70c4b88a72f6';
+var queryString = require('query-string');
+var async = require('async');
+/*
 var paginate = function (list, page, itemPerPage) {
 	page = page || 1;
 	itemPerPage = itemPerPage || 5;
 	return _.slice(list, (page-1) * itemPerPage, (page) * itemPerPage);
 }
-
+*/
 module.exports = {
 	popular: function (req, res) {
+		/*
+		// TODO
 		client.popularMovies(function(err, movies) {
 			if (err) return res.send({});
 			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
 			if (req.wantsJSON) return res.json(movies);
 			else               return res.send(movies);
 		});
+		*/
 	},
 
 	search: function (req, res) {
-		var searchParam = {
-			query: req.param('name'),
-			includeAdult: true
+		try {
+			var page = req.param('page') || 1;
+			var query = {
+				api_key: api_key,
+				query: req.param('name'),
+				page: page
+			}
+			var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
+			get(url).asBuffer(function(err, data) {
+				data = JSON.parse(data);
+
+				if (err) sails.log.debug(err);
+				else sails.log.debug(data);
+
+				async.map(
+					data.results,
+					function (m, callback) {
+						var o = {
+							imdb_id: m.id,
+							release_date: m.release_date,
+							synopsis: m.overview,
+							title: m.title,
+							vote_average: m.vote_average,
+							popularity: m.popularity,
+							backdrop_url: 'http://image.tmdb.org/t/p/w185/'+m.backdrop_path,
+							poster_url: 'http://image.tmdb.org/t/p/w185/'+m.poster_path,
+						};
+						Movie.findOrCreate(o, o).exec(callback);
+					},
+					function (err, movies) {
+						sails.log.debug(err);
+						if (req.wantsJSON) res.json(movies);
+						else               res.send(movies);
+					}
+				);
+
+			});
+		} catch (e) {
+			sails.log.debug(e);
 		}
-		client.searchMovies(searchParam, function (err, movies) {
-			if (err) return res.send({});
-			movies = _.sortBy(movies, req.param('sortBy') || 'popularity');
-			if (req.param('order') != 'desc') _.reverse(movies);
-			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
-			if (req.wantsJSON) return res.json(movies);
-			else               return res.send(movies);
-		});
 	},
 
 	main: function (req, res) {
@@ -51,7 +85,7 @@ module.exports = {
 
 	play: function (req, res) {
 		// J'ai du utilise une requete HTTP ici au lieu du module nodejs TMDB a cause d'un bug dedans
-		var url = 'http://api.themoviedb.org/3/movie/'+req.param('id')+'?api_key=67493736c8511d59d83f70c4b88a72f6';
+		var url = 'http://api.themoviedb.org/3/movie/'+req.param('id')+'?api_key='+api_key;
 		get(url).asBuffer(function(err, data) {
 			if (err) return res.send({});
 			var movie = JSON.parse(data);

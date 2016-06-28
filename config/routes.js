@@ -56,7 +56,7 @@ module.exports.routes = {
   // Search a subtitle for this torrent
   'get /torrent/:id/subtitle/:lang': 'SubtitleController.search',
 
-  '/auth/login': {
+  'get /auth/login': {
     view: 'user/connexion'
   },
 
@@ -83,7 +83,11 @@ module.exports.routes = {
   '/lost_password': {
     view: 'user/lost_password'
   },
-  '/reset_pwd': 'UserController.reset_pwd',
+  '/send_reset_pwd': 'UserController.send_reset_pwd',
+
+  '/new_pwd': 'UserController.new_pwd',
+
+  'get /reset_pwd': 'UserController.reset_pwd',
 
   '/my_profil': 'UserController.my_profil',
 

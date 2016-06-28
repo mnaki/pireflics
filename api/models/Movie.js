@@ -8,7 +8,35 @@
 module.exports = {
 
   attributes: {
-
+    imdb_id: {
+      required: true,
+      type: 'string',
+      unique: false
+    },
+    release_date: {
+      type: 'date'
+    },
+    synopsis: {
+      type: 'text'
+    },
+    poster_url: {
+      type: 'string'
+    },
+    backdrop_url: {
+      type: 'string'
+    },
+    title: {
+      type: 'string'
+    },
+    vote_average: {
+      type: 'float'
+    },
+    popularity: {
+      type: 'float'
+    },
+    seen: {
+      type: 'boolean',
+      defaultsTo: false
+    }
   }
 };
-
