@@ -1,51 +1,48 @@
 <div class="modal-content">
 
     <div class="modal-header">
-        <h1 class="text-center">Inscription</h1>
+        <h1 class="text-center"><%= __('Register')%></h1>
     </div>
     <div class="modal-body">
         <form method="post" action="/user">
             <div class="row inscr">
                 <div class="col-md-6">
-                    <label>Nom* :</label>
-                    <input name="lastname" type="text"  class="form-control input-lg" placeholder="Nom">
+                    <label><%= __('Lastname')%>* :</label>
+                    <input name="lastname" type="text"  class="form-control input-lg" placeholder="Dupond">
                 </div>
 
                 <div class="col-md-6">
-                    <label>Prénom* :</label>
-                    <input name="firstname" type="text"  class="form-control input-lg" placeholder="Prénom">
+                    <label><%= __('Firstname')%>* :</label>
+                    <input name="firstname" type="text"  class="form-control input-lg" placeholder="Jacky">
                 </div>
 
                 <div class="col-md-6">
                     <label>image* :</label>
-                    <input name="image" type="text"  class="form-control input-lg" placeholder="Prénom">
+                    <input name="image" type="text"  class="form-control input-lg" placeholder="ex: http://exemple.com/image.jpeg">
                 </div>
 
                 <div class="col-md-6">
-                    <label>Email* :</label>
-                    <input name="email" type="email"  class="form-control input-lg" placeholder="Adresse Mail">
+                    <label><%= __('Email')%>* :</label>
+                    <input name="email" type="email"  class="form-control input-lg" placeholder="jdupond@mail.com">
                 </div>
 
                 <div class="col-md-6">
-                    <label>Mot de passe* :</label>
-                    <input name="pwd" type="password" class="form-control input-lg" placeholder="Mot de passe">
+                    <label><%= __('Password')%>* :</label>
+                    <input name="pwd" type="password" class="form-control input-lg" placeholder="<%= __('Password')%>">
                 </div>
                 <div class="col-md-6">
-                    <p>*champs obligatoires</p>
+                    <p>*<%= __('Fields required')%></p>
                 </div>
 
                 <div class="col-md-12 valider">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Valider</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block"><%= __('Send')%></button>
                 </div>
             </div>
         </form>
     </div>
     <div class="modal-footer">
         <p class="text-center text-info">
-            Conformément à la loi n° 78-17 du 6 janvier 1978, relative à l'Informatique, aux Fichiers et aux Libertés,
-            vous disposez d'un droit d'accès et de rectification des données à caractère personnel vous concernant
-            et faisant l’objet de traitements sous la responsabilité du RSI. (ou pas vu que c'est un projet d'école, si tu met tes
-            info perso pendant la correction, on en fera ce qu'il nous en plaira !)
+            <%= __('text loi')%>
         </p>
     </div>
 </div>
