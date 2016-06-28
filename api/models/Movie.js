@@ -34,9 +34,9 @@ module.exports = {
     popularity: {
       type: 'float'
     },
-    seen: {
-      type: 'boolean',
-      defaultsTo: false
+    viewers: {
+      collection: 'user',
+      via: 'viewed_movies'
     }
   }
 };
