@@ -36,7 +36,10 @@ module.exports = {
     },
     edit_info : function (req, res){
         if(req.user) {
-            User.update({ id : req.session.user.id }, { firstname : req.param('firstname'), lastname : req.param('lastname'), email : req.param('email') }).exec(function afterupdate(err, updated){
+            User.update({ id : req.session.user.id }, { firstname : req.param('firstname'),
+                                                        lastname : req.param('lastname'),
+                                                        email : req.param('email'),
+                                                        default_language : req.param('lang')}).exec(function afterupdate(err, updated){
                 if (err){
                     console.log(err.code);
                     req.session.msg = err.code;
@@ -46,6 +49,7 @@ module.exports = {
                     req.session.user.lastname = req.param('lastname');
                     req.session.user.firstname = req.param('firstname');
                     req.session.user.email = req.param('email');
+                    req.session.user.default_language = req.param('lang');
                     res.redirect('user/my_profil');
                 }
             });
