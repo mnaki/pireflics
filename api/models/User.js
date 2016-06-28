@@ -44,7 +44,6 @@ module.exports = {
 
 	// if its local strategy, hash it
 	else {
-        sails.log.debug('PWD define');
         bcrypt.genSalt(10, function(err, salt) {
 			bcrypt.hash(user.pwd, salt, function(err, hash) {
 				if (err) {

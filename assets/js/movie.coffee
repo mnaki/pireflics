@@ -1,27 +1,25 @@
 currentPage = 1
-itemPerPage = 5
 
 window.onload = ->
   populateList = (movies) ->
     $.each movies, (key, val) ->
       $.ajax
         url: '/movie/partial'
-        data: { page: currentPage, itemPerPage: itemPerPage, data: val }
+        data: { page: currentPage, data: val }
         success: (partialData) ->
           $('.video-list').append partialData
 
   search = (searchText) ->
     if $('.searchform .movieName').val() == ''
       $('select').each((i, e) -> $(e).attr('disabled', ''))
-      $.getJSON '/movie/popular', {page: currentPage, itemPerPage: itemPerPage}, (movies) ->
+      $.getJSON '/movie/popular', {page: currentPage }, (movies) ->
         populateList movies
     else
       $('select').each((i, e) -> $(e).removeAttr('disabled'))
     $.getJSON '/movie/search/' + searchText, {
       sortBy: $('#sortby').val(),
       order: $('#order').val(),
-      page: currentPage,
-      itemPerPage: itemPerPage
+      page: currentPage
       }, (movies) ->
       populateList movies
 
