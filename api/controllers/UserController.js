@@ -4,6 +4,7 @@
  * @description :: Server-side logic for managing users
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+var bcrypt = require('bcryptjs');
 
 module.exports = {
 
@@ -93,21 +94,18 @@ module.exports = {
     reset_pwd: function (req, res) {
         var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
         if(base64regex.test(req.param('token'))) {
-
-            var token = new Buffer(req.param('token'), 'base64').toString('ascii');
-
+            var token = new Buffer(req.param('token'), 'base64').toString('utf8');
             Token.findOne({token : token}).exec(function(err, returnToken){
-
                 if(err){return sails.log.debug(err)};
 
                 if(!returnToken){
                     req.session.msg = 'Not a valid token.';
                     res.redirect('/auth/login');
                 }
-                else{
+                else {
                     var email = token.split('_');
                     req.session.tmp_email = email[1];
-                    //Token.destroy({token : token}).exec(function(err, result){if(err){sails.log.debug(err)}})
+                    Token.destroy({token : token}).exec(function(err, result){if(err){sails.log.debug(err)}})
                     res.view('user/new_password');
                 }
             })
@@ -119,15 +117,24 @@ module.exports = {
     },
     new_pwd : function (req, res) {
         var pwd = req.param('password');
-        bcrypt.hash(pwd, salt, function(err, hash) {
-            if (err) {
-                sails.log.debug(err);
-            } else {
-                pwd = hash;
-            }
+        bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash(pwd, salt, function (err, hash) {
+                if (err) {
+                    sails.log.debug(err);
+                }
+                else {
+                    pwd = hash;
+                    User.update({email : req.session.tmp_email}, {pwd: pwd}).exec(function (err, result){
+                        if(err){
+                            sails.log.debug(err)
+                        }
+                    });
+                    req.session.tmp_email = null;
+                    res.redirect('/auth/login');
+
+                }
+            })
         });
-        User.update({email : req.session.tmp_email}, {pwd: req.param('password')}).exec(function (err, result){if(err){sails.log.debug(err)}})
-        res.redirect('/auth/login');
     }
 };
 
