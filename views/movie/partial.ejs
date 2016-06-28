@@ -1,13 +1,13 @@
 <div class="col-sm-12 col-md-3">
 	<div class="thumbnail movie-tile">
-	  <img src="<%= data.poster_url %>" alt="<%= data.title %>">
+	  <img src="<%= movie.poster_url %>" alt="<%= movie.title %>">
 	  <div class="caption">
-	    <h3><%= data.title %></h3>
-			<h4><%= data.release_date %></h4>
-			<h4><%= __('Rate')%> : <%= data.vote_average %></h4>
-	    <p><%= data.synopsis %></p>
+	    <h3><%= movie.title %></h3>
+			<h4><%= movie.release_date %></h4>
+			<h4><%= __('Rate')%> : <%= movie.vote_average %></h4>
+	    <p><%= movie.synopsis %></p>
 	    <p>
-				<a href="/movie/play/<%= data.id %>" class="btn btn-primary" role="button"><%= __('Play')%></a>
+				<a href="/movie/play/<%= movie.id %>" class="btn btn-primary" role="button"><%= __('Play')%></a>
 			</p>
 	  </div>
 	</div>

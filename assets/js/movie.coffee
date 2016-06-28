@@ -3,9 +3,9 @@ currentPage = 1
 window.onload = ->
   populateList = (movies) ->
     $.each movies, (key, val) ->
+      console.log val[0]
       $.ajax
-        url: '/movie/partial'
-        data: { page: currentPage, data: val }
+        url: '/movie/partial/'+val[0].id
         success: (partialData) ->
           $('.video-list').append partialData
 

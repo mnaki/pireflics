@@ -35,11 +35,10 @@ var fetchCast = function (m, callback) {
 		api_key: api_key
 	}
 	var url = 'http://api.themoviedb.org/3/movie/'+m.imdb_id+'/credits?'+queryString.stringify(query);
-	sails.log.debug('url = ' + url);
 	get(url).asBuffer(function(err, data) {
 		if (err) return;
 		var cast = JSON.parse(data).cast;
-		return Movie.update({id: m.id}, {cast: cast}).exec(callback);
+		return Movie.update({imdb_id: m.imdb_id}, {cast: cast}).exec(callback);
 	});
 
 };
@@ -51,9 +50,8 @@ var sendCachedMovies = function (data, res) {
 			cacheMovies,
 			function (err, movies) {
 				if (err) return;
-				res.json(_.omitBy(movies, function (o) {
-					return _.isNil(o.title);
-				}));
+				// res.json(_.omitBy(movies, function (o) { return _.isNil(o.title) } ));
+				res.json(movies);
 			}
 		);
 	}
@@ -102,7 +100,10 @@ module.exports = {
 	},
 
 	partial: function (req, res) {
-		return res.view({ layout: false, data: req.param('data') });
+		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
+			// return res.json(movie);
+			return res.view({ layout: false, movie: movie });
+		})
 	},
 
 	play: function (req, res) {
