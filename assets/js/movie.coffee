@@ -3,19 +3,16 @@ currentPage = 1
 window.onload = ->
   populateList = (movies) ->
     $.each movies, (key, val) ->
-      console.log val[0]
+      console.log val
       $.ajax
-        url: '/movie/partial/'+val[0].id
+        url: '/movie/partial/'+val.id
         success: (partialData) ->
           $('.video-list').append partialData
 
   search = (searchText) ->
     if $('.searchform .movieName').val() == ''
-      $('select').each((i, e) -> $(e).attr('disabled', ''))
       $.getJSON '/movie/popular', {page: currentPage }, (movies) ->
         populateList movies
-    else
-      $('select').each((i, e) -> $(e).removeAttr('disabled'))
     $.getJSON '/movie/search/' + searchText, {
       sortBy: $('#sortby').val(),
       order: $('#order').val(),
@@ -36,13 +33,13 @@ window.onload = ->
   $(window).scroll _.throttle(->
     if $(window).scrollTop() + $(window).height() > $(document).height() - 100
       nextPage()
-  , 1500, trailing: true)
+  , 3000)
 
   onUserInput = ->
     $('.video-list').html ''
     $('.searchform .movieName').submit()
 
-  $('.searchform .movieName').keyup _.throttle(onUserInput, 1500, trailing: true)
+  $('.searchform .movieName').keyup _.throttle(onUserInput, 3000)
   $('.searchform').change onUserInput
 
-  search()
+  search('')

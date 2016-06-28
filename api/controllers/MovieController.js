@@ -51,6 +51,7 @@ var sendCachedMovies = function (data, res) {
 			function (err, movies) {
 				if (err) return;
 				// res.json(_.omitBy(movies, function (o) { return _.isNil(o.title) } ));
+				movies = _.flatten(movies, 1);
 				res.json(movies);
 			}
 		);
@@ -61,13 +62,12 @@ var sendCachedMovies = function (data, res) {
 module.exports = {
 	popular: function (req, res) {
 		try {
-			var page = req.param('page') || 1;
 			var query = {
 				api_key: api_key,
 				query: req.param('name'),
-				page: page,
+				page: req.param('page') || 1,
 				language: req.param('language') || 'en'
-			}
+			};
 			var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
 			get(url).asBuffer(function(err, data) {
 				if (err) return res.json({});
@@ -82,13 +82,12 @@ module.exports = {
 		else
 		{
 			try {
-				var page = req.param('page') || 1;
 				var query = {
 					api_key: api_key,
 					query: req.param('name'),
-					page: page,
+					page: req.param('page') || 1,
 					language: req.param('language') || 'en'
-				}
+				};
 				var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
 				get(url).asBuffer(function(err, data) {
 					if (err) return res.json({});
@@ -101,7 +100,6 @@ module.exports = {
 
 	partial: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			// return res.json(movie);
 			return res.view({ layout: false, movie: movie });
 		})
 	},
