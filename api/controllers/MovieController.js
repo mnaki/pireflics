@@ -25,47 +25,46 @@ var cacheMovies = function (m, callback) {
 	Movie.findOrCreate(o, o).exec(callback);
 };
 
-var sendCacheMovies = function (data, res) {
-	async.map(
-		data.results,
-		cacheMovies,
-		function (err, movies) {
-			res.json(movies);
-		}
-	);
+var sendCachedMovies = function (data, res) {
+	try {
+		async.map(
+			data.results,
+			cacheMovies,
+			function (err, movies) {
+				if (err) return res.json({});
+				res.json(_.omitBy(movies, function (o) {
+					return _.isNil(o.title);
+				}));
+			}
+		);
+	}
+	catch (e)
+	{
+		return res.json({});
+	}
 }
 
 module.exports = {
 	popular: function (req, res) {
-
-		if (!req.wantsJSON)
-		{
-			return res.view();
-		}
-		else
-		{
-			try {
-				var page = req.param('page') || 1;
-				var query = {
-					api_key: api_key,
-					query: req.param('name'),
-					page: page
-				}
-				var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
-				get(url).asBuffer(function(err, data) {
-					data = JSON.parse(data);
-					sendCacheMovies(data, res)
-				});
-			} catch (e) {
+		try {
+			var page = req.param('page') || 1;
+			var query = {
+				api_key: api_key,
+				query: req.param('name'),
+				page: page
 			}
+			var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
+			get(url).asBuffer(function(err, data) {
+				if (err) return res.json({});
+				sendCachedMovies(JSON.parse(data), res);
+			});
 		}
+		catch (e)
+		{}
 	},
 
 	search: function (req, res) {
-		if (!req.wantsJSON)
-		{
-			return res.view();
-		}
+		if (!req.wantsJSON) return res.view();
 		else
 		{
 			try {
@@ -77,12 +76,12 @@ module.exports = {
 				}
 				var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
 				get(url).asBuffer(function(err, data) {
-					if (err) return res.json(err);
-					data = JSON.parse(data);
-					sendCacheMovies(data, res)
+					if (err) return res.json({});
+					sendCachedMovies(JSON.parse(data), res);
 				});
-			} catch (e) {
 			}
+			catch (e)
+			{}
 		}
 	},
 
