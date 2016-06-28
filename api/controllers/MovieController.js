@@ -38,10 +38,7 @@ var sendCachedMovies = function (data, res) {
 			}
 		);
 	}
-	catch (e)
-	{
-		return ;
-	}
+	catch (e) { return; }
 }
 
 module.exports = {
@@ -59,8 +56,7 @@ module.exports = {
 				sendCachedMovies(JSON.parse(data), res);
 			});
 		}
-		catch (e)
-		{}
+		catch (e) { return; }
 	},
 
 	search: function (req, res) {
@@ -80,8 +76,7 @@ module.exports = {
 					sendCachedMovies(JSON.parse(data), res);
 				});
 			}
-			catch (e)
-			{}
+			catch (e) { return; }
 		}
 	},
 
