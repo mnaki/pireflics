@@ -37,6 +37,9 @@ module.exports = {
     viewers: {
       collection: 'user',
       via: 'viewed_movies'
+    },
+    cast: {
+      type: 'json'
     }
   }
 };

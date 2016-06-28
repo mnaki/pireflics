@@ -22,7 +22,26 @@ var cacheMovies = function (m, callback) {
 		backdrop_url: 'http://image.tmdb.org/t/p/w185/'+m.backdrop_path,
 		poster_url: 'http://image.tmdb.org/t/p/w185/'+m.poster_path,
 	};
-	Movie.findOrCreate(o, o).exec(callback);
+	return Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
+		if (err) return;
+		return fetchCast(rec, callback);
+	});
+	// return Movie.findOrCreate({imdb_id: m.id}, o).exec(callback);
+};
+
+var fetchCast = function (m, callback) {
+	if (!m) return;
+	var query = {
+		api_key: api_key
+	}
+	var url = 'http://api.themoviedb.org/3/movie/'+m.imdb_id+'/credits?'+queryString.stringify(query);
+	sails.log.debug('url = ' + url);
+	get(url).asBuffer(function(err, data) {
+		if (err) return;
+		var cast = JSON.parse(data).cast;
+		return Movie.update({id: m.id}, {cast: cast}).exec(callback);
+	});
+
 };
 
 var sendCachedMovies = function (data, res) {
@@ -31,7 +50,7 @@ var sendCachedMovies = function (data, res) {
 			data.results,
 			cacheMovies,
 			function (err, movies) {
-				if (err) return ;
+				if (err) return;
 				res.json(_.omitBy(movies, function (o) {
 					return _.isNil(o.title);
 				}));
@@ -48,7 +67,8 @@ module.exports = {
 			var query = {
 				api_key: api_key,
 				query: req.param('name'),
-				page: page
+				page: page,
+				language: req.param('language') || 'en'
 			}
 			var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
 			get(url).asBuffer(function(err, data) {
@@ -68,7 +88,8 @@ module.exports = {
 				var query = {
 					api_key: api_key,
 					query: req.param('name'),
-					page: page
+					page: page,
+					language: req.param('language') || 'en'
 				}
 				var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
 				get(url).asBuffer(function(err, data) {
