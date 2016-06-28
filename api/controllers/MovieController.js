@@ -19,20 +19,23 @@ var paginate = function (list, page, itemPerPage) {
 	return _.slice(list, (page-1) * itemPerPage, (page) * itemPerPage);
 }
 */
+
+/*var cacheMovies = function (m, callback) {
+	var o = {
+		imdb_id: m.id,
+		release_date: m.release_date,
+		synopsis: m.overview,
+		title: m.title,
+		vote_average: m.vote_average,
+		popularity: m.popularity,
+		backdrop_url: 'http://image.tmdb.org/t/p/w185/'+m.backdrop_path,
+		poster_url: 'http://image.tmdb.org/t/p/w185/'+m.poster_path,
+	};
+	Movie.findOrCreate(o, o).exec(callback);
+}*/
+
 module.exports = {
 	popular: function (req, res) {
-		/*
-		// TODO
-		client.popularMovies(function(err, movies) {
-			if (err) return res.send({});
-			movies = paginate(movies, req.param('page'), req.param('itemPerPage'))
-			if (req.wantsJSON) return res.json(movies);
-			else               return res.send(movies);
-		});
-		*/
-	},
-
-	search: function (req, res) {
 		try {
 			var page = req.param('page') || 1;
 			var query = {
@@ -40,7 +43,7 @@ module.exports = {
 				query: req.param('name'),
 				page: page
 			}
-			var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
+			var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
 			get(url).asBuffer(function(err, data) {
 				data = JSON.parse(data);
 
@@ -49,19 +52,7 @@ module.exports = {
 
 				async.map(
 					data.results,
-					function (m, callback) {
-						var o = {
-							imdb_id: m.id,
-							release_date: m.release_date,
-							synopsis: m.overview,
-							title: m.title,
-							vote_average: m.vote_average,
-							popularity: m.popularity,
-							backdrop_url: 'http://image.tmdb.org/t/p/w185/'+m.backdrop_path,
-							poster_url: 'http://image.tmdb.org/t/p/w185/'+m.poster_path,
-						};
-						Movie.findOrCreate(o, o).exec(callback);
-					},
+					cacheMovies,
 					function (err, movies) {
 						sails.log.debug(err);
 						if (req.wantsJSON) res.json(movies);
@@ -73,6 +64,43 @@ module.exports = {
 		} catch (e) {
 			sails.log.debug(e);
 		}
+	},
+
+	search: function (req, res) {
+		if (!req.wantsJSON)
+		{
+			return res.view();
+		}
+		else
+		{
+			try {
+				var page = req.param('page') || 1;
+				var query = {
+					api_key: api_key,
+					query: req.param('name'),
+					page: page
+				}
+				var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
+				get(url).asBuffer(function(err, data) {
+					data = JSON.parse(data);
+
+					if (err) sails.log.debug(err);
+					else sails.log.debug(data);
+
+					async.map(
+						data.results,
+						cacheMovies,
+						function (err, movies) {
+							sails.log.debug(err);
+							res.json(movies);
+						}
+					);
+				});
+			} catch (e) {
+				sails.log.debug(e);
+			}
+		}
+
 	},
 
 	main: function (req, res) {
