@@ -40,46 +40,52 @@ module.exports = {
     search: function (req, res) {
 
         var name = req.params.name;
-		var queryname = _.join(_.split(name, " "), "%");
-
 		sails.log.debug("TorrentController | search |  searching for : " + name);
 
         // ensure that the name is valid
-        if (name == undefined || name.length < 2)
+        if (name === undefined || name.length == 0)
             return res.status(400);
 
-        // try to get a torrent already downloaded
-        Torrent.find({ title: { 'like': "%" + queryname + "%" } }).exec(function ( err, results ) {
-             // if not crawl it
-            if (err || results.length == 0) {
-				sails.log.debug("TorrentController | search |  No torrent found for title " + name + " start crawling ...")
+		Movie.find({ title: name }).populate('torrent').exec(function ( err, results ) {
+			if (err !== undefined ) {
+				var movie = results[0];
 
-				CrawlerService.search(name, function ( err, result ) {
-                    // if nothing is found send no result
-                    if ( err || result == null) {
-                        res.notFound(); return ;
-                    }
+				// if the torrent for this movie is already found
+				if (movie.torrent !== null && movie.torrent !== undefined) {
+					sails.log.debug("TorrentController | search |  A torrent has been found for title " + name )
+               		return res.ok(movie.torrent);
+				} else {
+					// else search for it
+					sails.log.debug("TorrentController | search |  No torrent found for title " + name + " start crawling ...")
 
-					// set the title to search it next time
-					result.title = result.info.title;
-                    result.download = false;
-					
-                    // and register it in the database
-					Torrent.create(result, function(err, model) {
-						if (err) 
-                            return res.serverError(err);
-                        else {
-					        sails.log.debug("TorrentController | search |  Crawler has found a torrent for " + name + ", registering it under id " + model.id);
-						    res.ok(model.toJSON());
-                        }
+					CrawlerService.search(name, function ( err, result ) {
+						// if nothing is found send no result
+						if ( err || result == null) {
+							res.notFound(); return ;
+						}
+
+						// set the title to search it next time
+						result.title = result.info.title;
+						result.download = false;
+							
+						// and register it in the database
+						Torrent.create(result, function(err, model) {
+							if (err) 
+								return res.serverError(err);
+							else {
+								sails.log.debug("TorrentController | search |  Crawler has found a torrent for movie " + movie.id + ", registering it under id " + model.id);
+								res.ok(model.toJSON());
+								// link with movie
+								movie.torrent = model;
+								movie.save();
+							}
+						});
 					});
-                });			
+				}
 			}
-			else {
-				sails.log.debug("TorrentController | search |  A torrent has been found for title " + name )
-                res.ok(results[0]);
-            }
-        });
+			else
+				res.notFound();
+		});
     },
 
     /**
@@ -97,13 +103,24 @@ module.exports = {
                 var torrent = results[0];
 
 
-                if (torrent.download) {
-                    res.json({ error: "already downloaded" });
-                    return ;
-                }
+                if (torrent.download) 
+                   return res.json({ error: "already downloaded" });
+                
+				else if (engines[torrent.id] !== undefined) 
+					return res.ok(torrent.toJSON());
+				
 
                  // start the download
                 var engine = torrentStream(torrent.magnet);
+
+				// try to find EN subtitles for this torrent
+				var subtitle = SubtitleService.search(torrent, "en", function ( err, results) {
+                    if (err) {
+						sails.log.debug("TorrentController | subtitle | no EN subtitle found for torrent " + torrent.id);
+						sails.log.debug(JSON.stringify(err));
+					} else
+						sails.log.debug("TorrentController | subtitle | EN subtitle found for torrent " + torrent.id);
+                });
 
                 engine.on('ready', function() {    
                     var target = null;

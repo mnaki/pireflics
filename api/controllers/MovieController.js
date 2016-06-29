@@ -10,6 +10,7 @@ var _ = require('lodash');
 var api_key = '67493736c8511d59d83f70c4b88a72f6';
 var queryString = require('query-string');
 var async = require('async');
+var moment = require('moment');
 
 var cacheMovies = function (m, callback) {
 	var o = {
@@ -102,14 +103,20 @@ module.exports = {
 	partial: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
 			// return res.json(movie);
+
+			// pretify the date
+			movie.release_date = moment(movie.release_date).fromNow();
+			// truncate the synopsis
+			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
 			return res.view({ layout: false, movie: movie });
 		})
 	},
 
 	play: function (req, res) {
-		movie = Movie.find({id: req.param('id')}).exec(function (err, rec) {
-			if (err || rec.length == 0) return;
-			return res.view('movie/play', { video: movie[0] });
+		movie = Movie.find({id: req.param('id')}).exec(function (err,results) {
+			if (err || results.length == 0) return res.serverError(err);
+
+			return res.view('movie/play', { video: results[0] });
 		});
 	}
 };
