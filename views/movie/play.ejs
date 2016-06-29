@@ -16,20 +16,20 @@
     <% comments.forEach(function(comment) {%>
     <div class="comment-block">
         <p>
-            <small><%= comment.user_id%> said :</small>
-            <%= comment.comment%>
+            <small><%= comment.user_id %> <%= __('said') %> :</small>
+            <%= comment.comment %>
         </p>
     </div>
     <%})%>
 
-    <% if(req.session.user){%>
+    <% if(req.session.user){ %>
     <form method="post" action="/movie/add_comment/<%= video.id %>">
         <div class="input-group">
-            <input type="text" name="comment" class="form-control" placeholder="Your comment" aria-describedby="basic-addon1">
-             <span class="input-group-btn">
-        <button class="btn btn-default" type="submit"><%= __('Send')%></button>
+            <input type="text" name="comment" class="form-control" placeholder="<%= __('Your comment') %>" aria-describedby="basic-addon1">
+            <span class="input-group-btn">
+        <button class="btn btn-default" type="submit"><%= __('Send') %></button>
       </span>
         </div>
     </form>
-    <%}%>
+    <% } %>
 </div>
