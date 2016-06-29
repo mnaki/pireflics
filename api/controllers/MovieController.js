@@ -47,11 +47,21 @@ module.exports = {
 		// return res.view('movie/play', { video: movie });
 		var url = 'http://api.themoviedb.org/3/movie/'+req.param('id')+'?api_key=67493736c8511d59d83f70c4b88a72f6';
 		sails.log.debug(url);
+		var comments = Comment.find({movie_id: req.param('id')}).exec(function (err, result){if(err){sails.log.debug(err)} comments = result;});
 		get(url).asBuffer(function(err, data) {
 			if (err) throw err;
 			var movie = JSON.parse(data);
 			sails.log.debug(movie);
-			return res.view('movie/play', { video: movie });
+			sails.log.debug(comments);
+			return res.view('movie/play', { video: movie, comments: comments });
 		});
+	},
+
+	add_comment: function(req, res){
+		Comment.create({comment: req.param('comment'), user_id: req.session.user.firstname, movie_id: req.param('id')}).exec(function (err, result){
+			if(err){sails.log.debug(err)};
+			return res.redirect('/movie/play/'+req.param('id'));
+		})
+
 	}
 };
