@@ -12,12 +12,13 @@ window.onload = ->
     if $('.searchform .movieName').val() == ''
       $.getJSON '/movie/popular', {page: currentPage }, (movies) ->
         populateList movies
-    $.getJSON '/movie/search/' + searchText, {
-      sortBy: $('#sortby').val(),
-      order: $('#order').val(),
-      page: currentPage
-      }, (movies) ->
-      	populateList movies
+    else
+      $.getJSON '/movie/search/' + searchText, {
+        sortBy: $('#sortby').val(),
+        order: $('#order').val(),
+        page: currentPage
+        }, (movies) ->
+        	populateList movies
 
   $('.searchform').submit (e) ->
     currentPage = 1

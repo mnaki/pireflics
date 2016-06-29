@@ -50,8 +50,7 @@ var sendCachedMovies = function (data, res) {
 			data.results,
 			cacheMovies,
 			function (err, movies) {
-				if (err) return;
-				// res.json(_.omitBy(movies, function (o) { return _.isNil(o.title) } ));
+				if (err) res.json({});
 				movies = _.flatten(movies, 1);
 				res.json(movies);
 			}
@@ -101,6 +100,7 @@ module.exports = {
 
 	partial: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
+			if (err) res.json({});
 			// pretify the date
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
