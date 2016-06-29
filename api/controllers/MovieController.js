@@ -20,14 +20,13 @@ var cacheMovies = function (m, callback) {
 		title: m.title,
 		vote_average: m.vote_average,
 		popularity: m.popularity,
-		backdrop_url: 'http://image.tmdb.org/t/p/w185/'+m.backdrop_path,
-		poster_url: 'http://image.tmdb.org/t/p/w185/'+m.poster_path,
+		backdrop_url: 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path,
+		poster_url: 'http://image.tmdb.org/t/p/w1280/'+m.poster_path,
 	};
 	return Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
 		if (err) return;
 		return fetchCast(rec, callback);
 	});
-	// return Movie.findOrCreate({imdb_id: m.id}, o).exec(callback);
 };
 
 var fetchCast = function (m, callback) {
@@ -112,7 +111,6 @@ module.exports = {
 	play: function (req, res) {
 		movie = Movie.find({id: req.param('id')}).exec(function (err,results) {
 			if (err || results.length == 0) return res.serverError(err);
-
 			return res.view('movie/play', { video: results[0] });
 		});
 	}

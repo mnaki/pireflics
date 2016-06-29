@@ -41,8 +41,8 @@ module.exports = {
     cast: {
       type: 'json'
     },
-	torrent: {
-	  model: 'torrent'
-	}
+  	torrent: {
+  	  model: 'torrent'
+  	}
   }
 };
