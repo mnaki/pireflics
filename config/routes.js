@@ -38,7 +38,25 @@ module.exports.routes = {
     view: 'homepage'
   },
 
-  'get /auth/login': {
+  // Movie Controller
+  'get /movie': 'MovieController.main',
+  'get /movie/partial': 'MovieController.partial',
+  'get /movie/search/:name': 'MovieController.search',
+  'get /movie/play/:id': 'MovieController.play',
+
+  // Search a torrent
+  'get /torrent/search/:name': 'TorrentController.search',
+
+  // Download a torrent
+  'get /torrent/:id/download': 'TorrentController.download',
+
+  // Stream a torrent
+  'get /torrent/:id/stream': 'TorrentController.stream',
+
+  // Search a subtitle for this torrent
+  'get /torrent/:id/subtitle/:lang': 'SubtitleController.search',
+
+  '/auth/login': {
     view: 'user/connexion'
   },
 
@@ -62,22 +80,13 @@ module.exports.routes = {
     view: 'user/register'
   },
 
-  '/lost_password': {
-    view: 'user/lost_password'
-  },
-  '/send_reset_pwd': 'UserController.send_reset_pwd',
-
-  '/new_pwd': 'UserController.new_pwd',
-
-  'get /reset_pwd': 'UserController.reset_pwd',
-
   '/my_profil': 'UserController.my_profil',
 
   '/update_picture' : 'UserController.edit_picture',
 
-  '/update_info' : 'Usercontroller.edit_info',
+  '/update_info' : 'Usercontroller.edit_info'
 
-  
+
 /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
@@ -87,5 +96,4 @@ module.exports.routes = {
   * for configuration options and examples.                                  *
   *                                                                          *
   ***************************************************************************/
-
 };

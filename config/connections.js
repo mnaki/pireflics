@@ -28,9 +28,10 @@ module.exports.connections = {
   * Installed by default.                                                    *
   *                                                                          *
   ***************************************************************************/
-  // localDiskDb: {
-  //   adapter: 'sails-disk'
-  // },
+
+  //localDiskDb: {
+  //  adapter: 'sails-disk'
+  //},
 
   /***************************************************************************
   *                                                                          *
@@ -40,6 +41,7 @@ module.exports.connections = {
   * Run: npm install sails-mysql                                             *
   *                                                                          *
   ***************************************************************************/
+
    mysqlserver: {
     adapter: 'sails-mysql',
     host: 'status.hardfight.fr',
@@ -56,6 +58,7 @@ module.exports.connections = {
   * Run: npm install sails-mongo                                             *
   *                                                                          *
   ***************************************************************************/
+
   /*mongodb: {
     adapter: 'sails-mongo',
     host: 'status.hardfight.fr',

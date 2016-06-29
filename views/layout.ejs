@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="fr">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8">
@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
   <link href='https://fonts.googleapis.com/css?family=Seaweed+Script' rel='stylesheet' type='text/css'>
   <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+  <script src="//cdn.jsdelivr.net/lodash/4.13.1/lodash.min.js"></script>
 </head>
 <body>
 <div class="page">
@@ -28,13 +29,13 @@
           <ul class="nav navbar-nav">
             <% if(req.session.user == null){ %>
               <li>
-                <a href="/auth/login"><%= __('Connexion')%></a>
+                <a href="/auth/login">Connexion</a>
               </li>
             <% } else { %>
               <li>
               </li>
               <li>
-                <a href="#"><%= __('Search')%></a>
+                <a href="/movie">Recherche</a>
               </li>
               <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -44,8 +45,8 @@
                   <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a href="/my_profil">- <%= __('My profil')%></a></li>
-                  <li><a href="/auth/logout">- <%= __('Log out')%></a></li>
+                  <li><a href="/my_profil">- Mon profil</a></li>
+                  <li><a href="/auth/logout">- Me déconnecter</a></li>
                 </ul>
               </li>
             <% } %>
