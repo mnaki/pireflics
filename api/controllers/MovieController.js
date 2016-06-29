@@ -44,56 +44,47 @@ var fetchCast = function (m, callback) {
 };
 
 var sendCachedMovies = function (data, res) {
-	try {
-		async.map(
-			data.results,
-			cacheMovies,
-			function (err, movies) {
-				if (err) res.json({});
-				movies = _.flatten(movies, 1);
-				res.json(movies);
-			}
-		);
-	}
-	catch (e) { return; }
+	async.map(
+		data.results,
+		cacheMovies,
+		function (err, movies) {
+			if (err) res.json({});
+			movies = _.flatten(movies, 1);
+			res.json(movies);
+		}
+	);
 }
 
 module.exports = {
 	popular: function (req, res) {
-		try {
-			var query = {
-				api_key: api_key,
-				query: req.param('name'),
-				page: req.param('page') || 1,
-				language: req.param('language') || 'en'
-			};
-			var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
-			get(url).asBuffer(function(err, data) {
-				if (err) return res.json({});
-				sendCachedMovies(JSON.parse(data), res);
-			});
-		}
-		catch (e) { return; }
+		var query = {
+			api_key: api_key,
+			query: req.param('name'),
+			page: req.param('page') || 1,
+			language: req.param('language') || 'en'
+		};
+		var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
+		get(url).asBuffer(function(err, data) {
+			if (err) return res.json({});
+			sendCachedMovies(JSON.parse(data), res);
+		});
 	},
 
 	search: function (req, res) {
 		if (!req.wantsJSON) return res.view();
 		else
 		{
-			try {
-				var query = {
-					api_key: api_key,
-					query: req.param('name'),
-					page: req.param('page') || 1,
-					language: req.param('language') || 'en'
-				};
-				var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
-				get(url).asBuffer(function(err, data) {
-					if (err) return res.json({});
-					sendCachedMovies(JSON.parse(data), res);
-				});
-			}
-			catch (e) { return; }
+			var query = {
+				api_key: api_key,
+				query: req.param('name'),
+				page: req.param('page') || 1,
+				language: req.param('language') || 'en'
+			};
+			var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
+			get(url).asBuffer(function(err, data) {
+				if (err) return res.json({});
+				sendCachedMovies(JSON.parse(data), res);
+			});
 		}
 	},
 
