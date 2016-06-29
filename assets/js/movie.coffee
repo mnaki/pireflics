@@ -3,7 +3,6 @@ currentPage = 1
 window.onload = ->
   populateList = (movies) ->
     $.each movies, (key, val) ->
-      console.log val
       $.ajax
         url: '/movie/partial/'+val.id
         success: (partialData) ->
@@ -18,7 +17,7 @@ window.onload = ->
       order: $('#order').val(),
       page: currentPage
       }, (movies) ->
-      populateList movies
+      	populateList movies
 
   $('.searchform').submit (e) ->
     currentPage = 1
