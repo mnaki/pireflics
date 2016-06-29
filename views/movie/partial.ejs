@@ -1,18 +1,28 @@
+
 <div class="col-sm-12 col-md-6">
-		<div class="col-sm-6">
+		<div class="col-sm-4">
 			<div class="thumbnail movie-tile">
-			  <img height=300 src="<%= movie.poster_url %>" alt="<%= movie.title %>">
+			  <img src="<%= movie.poster_url || 'http://image.tmdb.org/t/p/w1280//XvJCJ5LBHTWQxsQN9Sddphp7xe.jpg' %>" alt="<%= movie.title %>">
 			</div>
 		</div>
-		<div class="col-sm-6">
+		<div class="col-sm-6 caption-wrapper">
 		  <div class="caption">
 		    <h3><%= movie.title %></h3>
 				<h4><%= movie.release_date %></h4>
 				<h4><%= __('Rate')%> : <%= movie.vote_average %></h4>
-		    <p><%= movie.synopsis %></p>
+		    <p clas='synopsis'><%= movie.synopsis %></p>
 		    <p>
 					<a href="/movie/play/<%= movie.id %>" class="btn btn-primary" role="button"><%= __('Play')%></a>
 				</p>
 	  </div>
+		<br>
 	</div>
-</div>
+<style>
+.movie-tile img {
+	 height: 200px;
+	 width: 113px;
+}
+.caption-wrapper {
+	height: 400px;
+}
+</style>
