@@ -43,6 +43,7 @@ module.exports.routes = {
   'get /movie/partial/:id': 'MovieController.partial',
   'get /movie/search/:name': 'MovieController.search',
   'get /movie/play/:id': 'MovieController.play',
+  'post /movie/add_comment/:id': 'MovieController.add_comment',
 
   // Search a torrent
   'get /torrent/search/:name': 'TorrentController.search',

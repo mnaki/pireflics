@@ -102,7 +102,18 @@ module.exports = {
 	play: function (req, res) {
 		movie = Movie.find({id: req.param('id')}).exec(function (err,results) {
 			if (err || results.length == 0) return res.serverError(err);
-			return res.view('movie/play', { video: results[0] });
+			Comment.find({movie_id: req.param('id')}, function (err, comments) {
+				if (err) return;
+				return res.view('movie/play', { video: results[0], comments: comments });
+			});
 		});
+	},
+
+	add_comment: function(req, res){
+		Comment.create({comment: req.param('comment'), user_id: req.session.user.firstname, movie_id: req.param('id')}).exec(function (err, result){
+			if(err){sails.log.debug(err)};
+			return res.redirect('/movie/play/'+req.param('id'));
+		})
+
 	}
 };
