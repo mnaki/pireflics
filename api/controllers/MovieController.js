@@ -120,9 +120,9 @@ module.exports = {
 					user.save(function (err) {
 						if (err) return res.json(err);
 						// pretify the date
-						movie.release_date = moment(video.release_date).fromNow();
+						movie.release_date = moment(movie.release_date).fromNow();
 						// truncate the synopsis
-						movie.synopsis = _.truncate(video.synopsis, { 'length': 500 });
+						movie.synopsis = _.truncate(movie.synopsis, { 'length': 500 });
 						return res.view('movie/play', { video: movie, comments: comments });
 					});
 				});
