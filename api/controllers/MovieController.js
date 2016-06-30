@@ -23,9 +23,12 @@ var cacheMovies = function (m, callback) {
 		backdrop_url: 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path,
 		poster_url: 'http://image.tmdb.org/t/p/w1280/'+m.poster_path,
 	};
-	return Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
+	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
 		if (err) return;
-		return fetchCast(rec, callback);
+		fetchCast(rec, function(){
+			// TODO
+		});
+		return callback(null, rec);
 	});
 };
 
