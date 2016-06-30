@@ -1,15 +1,15 @@
 var torrentID = null;
+var player = videojs("player");
 
 // Show modal
 
 $('#waitModal').modal({
-    backdrop: 'static',
-    keyboard: true
+    backdrop: 'static'
 })
 var waitModalText = $("#waitModalText");
 
 // Pseudo loading
-setInterval(function() {
+var loading = setInterval(function() {
 	var tmp = $("#waitModalText").children()[0].innerHTML;
 	if (tmp.indexOf('...') > 0) 
 		$("#waitModalText").children()[0].innerHTML = _.replace(tmp, '...', '');
@@ -24,18 +24,64 @@ waitModalText.append("<p>> Searching for a torrent </p>");
 $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 
 	waitModalText.append("<p>> Found a torrent available, starting download </p>");
-	torrentID = data.id;
+	
+	// query for user subtitle
+	$.get("/torrent/" + data.id + "/subtitle/mine").done(function (subtitle) {
+		if (subtitle.lang !== "en") {
+			player.addRemoteTextTrack({
+				kind: "captions",
+				lang: subtitle.lang,
+				label: subtitle.lang,
+				src: "/videos/" + data.id + "/" + subtitle.lang + ".vtt"
+			})
+		}
+	});
+	
 	// start the download
 	$.get("/torrent/" + data.id + "/download").done(function (torrent) {
-		console.log(torrent)
-		waitModalText.append("<p>> Ready ! </p>");
+
+		// if its mkv, we will convert it
 		if (torrent.path.split(".").pop() == "mkv") {
 			waitModalText.append("<p>! Need to convert the torrent, that gonna take some time </p>");
+
+			// start task to update percentage of convert
+			var percentage = setInterval(function () {
+				$.get("/torrent/" + data.id).done(function (torrent) {
+					// if the torrent has startd the convert yet, stop here
+					if (torrent.download) {
+						waitModalText.append("<p>> Ready ! </p>");
+						// stop the loading task
+						clearInterval(loading);
+						// clear modal
+						$('#waitModal').modal('hide');
+						
+						// setup the player
+						player.pause();
+						player.src([
+							{ type: torrent.mime, src: "/torrent/" + data.id + "/stream" }
+						]);
+						player.addRemoteTextTrack({
+							kind: "captions",
+							lang: "en",
+							label: "en",
+							src: "/videos/" + data.id + "/en.vtt"
+						})
+						$("#div_video").removeClass("vjs-playing").addClass("vjs-paused");
+						player.load();
+						// and play
+						player.play();
+					}
+				});
+			}, 5000);
 		} else {
+
+			waitModalText.append("<p>> Ready ! </p>");
+			// stop the loading task
+			clearInterval(loading);
+			// clear modal
 			$('#waitModal').modal('hide');
-			$("#player").append('<source src="/torrent/' + data.id + '/stream" type="' + torrent.mime  + '">')
 			
-			var player = videojs("player");
+			// setup the player
 			player.pause();
 			player.src([
 				{ type: torrent.mime, src: "/torrent/" + data.id + "/stream" }
@@ -43,11 +89,13 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 			player.addRemoteTextTrack({
 				kind: "captions",
 				lang: "en",
-				label: "english",
+				label: "en",
 				src: "/videos/" + data.id + "/en.vtt"
 			})
      		$("#div_video").removeClass("vjs-playing").addClass("vjs-paused");
 			player.load();
+			// and play
+			player.play();
 		}
 	}).fail(function (err) {
 		console.log(err)
