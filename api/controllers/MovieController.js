@@ -51,13 +51,15 @@ var fetchCast = function (m, callback) {
 	catch (e) { return callback(new Error(e)); }
 };
 
-var sendCachedMovies = function (data, res) {
+var sendCachedMovies = function (data, req, res) {
 	async.map(
 		data.results,
 		cacheMovies,
 		function (err, movies) {
 			if (err) return res.send(err);
 			movies = _.flatten(movies, 1);
+			movies = _.sortby(movies, req.param('sortby'));
+			if (req.param('order') == 'desc') movies = _.reverse(movies);
 			return res.json(movies);
 		}
 	);
@@ -76,7 +78,7 @@ module.exports = {
 		{
 			get(url).asBuffer(function(err, data) {
 				if (err) return res.send(err);
-				return sendCachedMovies(JSON.parse(data), res);
+				return sendCachedMovies(JSON.parse(data), req, res);
 			});
 		}
 		catch (e) { return callback(new Error(e)); }
@@ -98,7 +100,7 @@ module.exports = {
 			{
 				get(url).asBuffer(function(err, data) {
 					if (err) return res.send(err);
-					return sendCachedMovies(JSON.parse(data), res);
+					return sendCachedMovies(JSON.parse(data), req, res);
 				});
 			}
 			catch (e) { return callback(new Error(e)); }
