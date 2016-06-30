@@ -99,7 +99,7 @@ module.exports = {
 			// truncate the synopsis
 			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
 			if (!req.session || !req.session.user)
-				;
+				return ;
 			User.findOne(req.session.user.id, function (err, user) {
 				return res.view({ layout: false, movie: movie, user: user });
 			});
