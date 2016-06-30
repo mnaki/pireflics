@@ -117,8 +117,7 @@ module.exports = {
 						user.movies.push(movie.id);
 					user.save(function (err) {
 						if (err) return res.json(err);
-						// return res.view('movie/play', { video: movie, comments: comments });
-						return res.json(movie);
+						return res.view('movie/play', { video: movie, comments: comments });
 					});
 				});
 			});
