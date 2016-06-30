@@ -35,7 +35,8 @@ module.exports = {
       type: 'float'
     },
     cast: {
-      type: 'json'
+      type: 'json',
+      defaultsTo: null
     },
   	torrent: {
   	  model: 'torrent'

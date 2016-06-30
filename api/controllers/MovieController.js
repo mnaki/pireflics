@@ -36,6 +36,8 @@ var cacheMovies = function (m, callback) {
 
 var fetchCast = function (m, callback) {
 	if (!m) return;
+	if (m.cast != null)
+		return;
 	var query = {
 		api_key: api_key
 	}
@@ -59,6 +61,10 @@ var sendCachedMovies = function (data, req, res) {
 			if (err) return res.send(err);
 			movies = _.flatten(movies, 1);
 			movies = _.sortBy(movies, req.param('sortby'));
+			movies = _.pickBy(movies, function (m) {
+				var date = m.release_date.toISOString().split('-')[0];
+				return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
+			});
 			if (req.param('order') == 'desc') movies = _.reverse(movies);
 			return res.json(movies);
 		}
@@ -128,6 +134,8 @@ module.exports = {
 		// 	return res.forbidden('User is not logged in');
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
 			if (err || !movie) return res.send(err);
+			if (!movie.cast || movie.cast == {})
+				return res.forbidden('Movie is still under process, try again later');
 			Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
 				if (err || !comments) return res.send(err);
 				User.findOne(req.session.user.id, function (err, user) {

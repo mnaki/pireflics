@@ -9,26 +9,34 @@ window.onload = ->
           success: (partialData) ->
             $('.video-list').append partialData
           error: (err) ->
-            console.log err
+            # console.log err
 
   search = (searchText) ->
     try
       if $('.searchform .movieName').val() == ''
-        $.getJSON '/movie/popular', {page: currentPage }, (movies) ->
+        $.getJSON '/movie/popular', { page: currentPage }, (movies) ->
           populateList movies
         $.ajax
           url: '/movie/popular'
           data: { page: currentPage }
           success: (movies) -> populateList movies
-          error: (err) -> console.log err
+          error: (err) ->
+            # console.log err
       else
         $.ajax
           url: '/movie/search/' + searchText
-          data: { sortBy: $('#sortby').val(), order: $('#order').val(), page: currentPage }
+          data: {
+            sortBy: $('#sortby').val(),
+            order: $('#order').val(),
+            page: currentPage,
+            yearFrom: $('#yearFrom').val(),
+            yearTo: $('#yearTo').val(),
+          }
           success: (movies) -> populateList movies
-          error: (err) -> console.log err
+          error: (err) ->
+            # console.log err
     catch error
-      console.log error
+      # console.log error
 
   $('.searchform').submit (e) ->
     currentPage = 1
