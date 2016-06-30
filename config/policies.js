@@ -34,7 +34,16 @@ module.exports.policies = {
   * and its actions                                                          *
   *                                                                          *
   ***************************************************************************/
-  'PostController': {
+  'MovieController': {
+    '*': 'isAuthenticated'
+  },
+  'TorrentController': {
+    '*': 'isAuthenticated'
+  },
+  'UserController': {
+    '*': 'isAuthenticated'
+  },
+  'SubtitleController': {
     '*': 'isAuthenticated'
   }
 

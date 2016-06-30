@@ -284,6 +284,10 @@ module.exports = {
                 } else {
                     res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
                     fs.createReadStream(path).pipe(res);
+
+					// update model to know last date when torrent has been viewed
+					torrent.updatedAt = Date.now();
+					torrent.save();
                 }
              }
         });
