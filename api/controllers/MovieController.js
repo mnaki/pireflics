@@ -62,7 +62,7 @@ var sendCachedMovies = function (data, req, res) {
 		function (err, movies) {
 			if (err) return res.send(err);
 			movies = _.flatten(movies, 1);
-			movies = _.sortBy(movies, req.param('sortby'));
+			movies = _.sortBy(movies, req.param('sortBy'));
 			movies = _.pickBy(movies, function (m) {
 				var date = m.release_date.toISOString().split('-')[0];
 				return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
