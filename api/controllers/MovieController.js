@@ -20,11 +20,11 @@ var cacheMovies = function (m, callback) {
 		title: m.title,
 		vote_average: m.vote_average,
 		popularity: m.popularity,
-		backdrop_url: 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path,
-		poster_url: 'http://image.tmdb.org/t/p/w1280/'+m.poster_path,
+		backdrop_url: m.backdrop_path ? 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path : undefined,
+		poster_url: m.poster_path ? 'http://image.tmdb.org/t/p/w1280/'+m.poster_path : undefined,
 	};
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
-		if (err || !rec || rec.length < 1) return res.serverError(err);
+		if (err || !rec || rec.length < 1) return res.send(err);
 		fetchCast(rec, function (err, data) {
 			// TODO
 			if (err) sails.log.debug({error: err, movie: data});
@@ -40,12 +40,15 @@ var fetchCast = function (m, callback) {
 		api_key: api_key
 	}
 	var url = 'http://api.themoviedb.org/3/movie/'+m.imdb_id+'/credits?'+queryString.stringify(query);
-	get(url).asBuffer(function(err, data) {
-		if (err) return callback(err, data);
-		var cast = JSON.parse(data).cast;
-		return Movie.update({imdb_id: m.imdb_id}, {cast: cast}).exec(callback);
-	});
-
+	try
+	{
+		get(url).asBuffer(function(err, data) {
+			if (err) return callback(err, data);
+			var cast = JSON.parse(data).cast;
+			return Movie.update({imdb_id: m.imdb_id}, {cast: cast}).exec(callback);
+		});
+	}
+	catch (e) { return callback(new Error(e)); }
 };
 
 var sendCachedMovies = function (data, res) {
@@ -53,7 +56,7 @@ var sendCachedMovies = function (data, res) {
 		data.results,
 		cacheMovies,
 		function (err, movies) {
-			if (err) return res.serverError(err);
+			if (err) return res.send(err);
 			movies = _.flatten(movies, 1);
 			return res.json(movies);
 		}
@@ -69,13 +72,18 @@ module.exports = {
 			language: req.param('language') || 'en'
 		};
 		var url = 'http://api.themoviedb.org/3/movie/popular/?'+queryString.stringify(query);
-		get(url).asBuffer(function(err, data) {
-			if (err) return res.serverError(err);
-			return sendCachedMovies(JSON.parse(data), res);
-		});
+		try
+		{
+			get(url).asBuffer(function(err, data) {
+				if (err) return res.send(err);
+				return sendCachedMovies(JSON.parse(data), res);
+			});
+		}
+		catch (e) { return callback(new Error(e)); }
 	},
 
 	search: function (req, res) {
+		// if (!req.session || !req.session.user) return res.forbidden('User is not logged in');
 		if (!req.wantsJSON) return res.view();
 		else
 		{
@@ -86,38 +94,42 @@ module.exports = {
 				language: req.param('language') || 'en'
 			};
 			var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
-			get(url).asBuffer(function(err, data) {
-				if (err) return res.serverError(err);
-				return sendCachedMovies(JSON.parse(data), res);
-			});
+			try
+			{
+				get(url).asBuffer(function(err, data) {
+					if (err) return res.send(err);
+					return sendCachedMovies(JSON.parse(data), res);
+				});
+			}
+			catch (e) { return callback(new Error(e)); }
 		}
 	},
 
 	partial: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			if (err || !movie) return res.serverError(err);
+			if (err || !movie) return res.send(err);
 			// pretify the date
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
 			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
-			if (!req.session || !req.session.user)
-				return res.forbidden({error: 'Not logged in'});
+			// if (!req.session || !req.session.user)
+			// 	return res.forbidden('User is not logged in');
 			User.findOne(req.session.user.id, function (err, user) {
-				if (err || !user) return res.serverError(err);
+				if (err || !user) return res.send(err);
 				return res.view({ layout: false, movie: movie, user: user });
 			});
 		})
 	},
 
 	play: function (req, res) {
-		if (!req.session || !req.session.user)
-			return res.forbidden({error: 'Not logged in'});
+		// if (!req.session || !req.session.user)
+		// 	return res.forbidden('User is not logged in');
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			if (err || !movie) return res.serverError({message: 'could not find movie', err});
+			if (err || !movie) return res.send(err);
 			Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
-				if (err || !comments) return res.serverError({message: 'comment error', err});
+				if (err || !comments) return res.send(err);
 				User.findOne(req.session.user.id, function (err, user) {
-					if (err || !user) return res.serverError(err);
+					if (err || !user) return res.send(err);
 					if (!user.movies)
 						user.movies = [movie.id];
 					else
@@ -138,7 +150,7 @@ module.exports = {
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user: req.session.user.id, movie_id: req.param('id')}).exec(function (err, result){
 			if (err || !result || result.length < 1) {
-				return res.serverError(err);
+				return res.send(err);
 			}
 			return res.redirect('/movie/play/'+req.param('id'));
 		})

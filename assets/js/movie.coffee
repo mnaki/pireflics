@@ -3,22 +3,32 @@ currentPage = 1
 window.onload = ->
   populateList = (movies) ->
     $.each movies, (key, val) ->
-      $.ajax
-        url: '/movie/partial/'+val.id
-        success: (partialData) ->
-          $('.video-list').append partialData
+      if val.id
+        $.ajax
+          url: '/movie/partial/'+val.id
+          success: (partialData) ->
+            $('.video-list').append partialData
+          error: (err) ->
+            console.log err
 
   search = (searchText) ->
-    if $('.searchform .movieName').val() == ''
-      $.getJSON '/movie/popular', {page: currentPage }, (movies) ->
-        populateList movies
-    else
-      $.getJSON '/movie/search/' + searchText, {
-        sortBy: $('#sortby').val(),
-        order: $('#order').val(),
-        page: currentPage
-        }, (movies) ->
-        	populateList movies
+    try
+      if $('.searchform .movieName').val() == ''
+        $.getJSON '/movie/popular', {page: currentPage }, (movies) ->
+          populateList movies
+        $.ajax
+          url: '/movie/popular'
+          data: { page: currentPage }
+          success: (movies) -> populateList movies
+          error: (err) -> console.log err
+      else
+        $.ajax
+          url: '/movie/search/' + searchText
+          data: { sortBy: $('#sortby').val(), order: $('#order').val(), page: currentPage }
+          success: (movies) -> populateList movies
+          error: (err) -> console.log err
+    catch error
+      console.log error
 
   $('.searchform').submit (e) ->
     currentPage = 1
