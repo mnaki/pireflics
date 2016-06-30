@@ -98,6 +98,8 @@ module.exports = {
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
 			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
+			if (!req.session || !req.session.user)
+				;
 			User.findOne(req.session.user.id, function (err, user) {
 				return res.view({ layout: false, movie: movie, user: user });
 			});
