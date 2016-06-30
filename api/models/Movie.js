@@ -34,10 +34,6 @@ module.exports = {
     popularity: {
       type: 'float'
     },
-    viewers: {
-      collection: 'user',
-      via: 'viewed_movies'
-    },
     cast: {
       type: 'json'
     },

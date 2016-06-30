@@ -71,3 +71,12 @@ a{
 .no-link{
     color: #333;
 }
+
+.caption {
+    height: 360px;
+}
+
+.tile img{
+    height: 300px;
+    width: auto;
+}

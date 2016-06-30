@@ -23,9 +23,12 @@ var cacheMovies = function (m, callback) {
 		backdrop_url: 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path,
 		poster_url: 'http://image.tmdb.org/t/p/w1280/'+m.poster_path,
 	};
-	return Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
+	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
 		if (err) return;
-		return fetchCast(rec, callback);
+		fetchCast(rec, function(){
+			// TODO
+		});
+		return callback(null, rec);
 	});
 };
 
@@ -95,25 +98,41 @@ module.exports = {
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
 			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
-			return res.view({ layout: false, movie: movie });
+			if (!req.session || !req.session.user)
+				;
+			User.findOne(req.session.user.id, function (err, user) {
+				return res.view({ layout: false, movie: movie, user: user });
+			});
 		})
 	},
 
 	play: function (req, res) {
-		movie = Movie.find({id: req.param('id')}).exec(function (err,results) {
-			if (err || results.length == 0) return res.serverError(err);
-			Comment.find({movie_id: req.param('id')}, function (err, comments) {
-				if (err) return;
-				return res.view('movie/play', { video: results[0], comments: comments });
+		movie = Movie.findOne({id: req.param('id')}).exec(function (err,movie) {
+			if (err || !movie) return res.serverError({str: 'could not find movie', error: err});
+			Comment.find({movie_id: movie.id}, function (err, comments) {
+				if (err) return res.json(err);
+				User.findOne(req.session.user.id, function (err, user) {
+					if (err) return res.json(err);
+					if (!user.movies)
+						user.movies = [movie.id];
+					else
+						user.movies.push(movie.id);
+					user.save(function (err) {
+						if (err) return res.json(err);
+						return res.view('movie/play', { video: movie, comments: comments });
+					});
+				});
 			});
 		});
 	},
 
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user_id: req.session.user.firstname, movie_id: req.param('id')}).exec(function (err, result){
-			if(err){sails.log.debug(err)};
+			if (err) {
+				sails.log.debug(err);
+				return;
+			}
 			return res.redirect('/movie/play/'+req.param('id'));
 		})
-
 	}
 };

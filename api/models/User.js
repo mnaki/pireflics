@@ -31,10 +31,9 @@ module.exports = {
       image : {
           type: 'url'
       },
-      viewed_movies: {
-        collection: 'movie',
-        via: 'viewers',
-        dominant: true
+      movies: {
+        type: 'array',
+        defaultsTo: []
       }
   },
 

@@ -39,7 +39,7 @@ window.onload = ->
     $('.video-list').html ''
     $('.searchform .movieName').submit()
 
-  $('.searchform .movieName').keyup _.throttle(onUserInput, 3000)
+  # $('.searchform .movieName').keyup _.throttle(onUserInput, 3000)
   $('.searchform').change onUserInput
 
   search('')
