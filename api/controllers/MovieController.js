@@ -58,7 +58,7 @@ var sendCachedMovies = function (data, req, res) {
 		function (err, movies) {
 			if (err) return res.send(err);
 			movies = _.flatten(movies, 1);
-			movies = _.sortby(movies, req.param('sortby'));
+			movies = _.sortBy(movies, req.param('sortby'));
 			if (req.param('order') == 'desc') movies = _.reverse(movies);
 			return res.json(movies);
 		}
