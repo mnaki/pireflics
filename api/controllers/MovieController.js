@@ -19,10 +19,12 @@ var cacheMovies = function (m, callback) {
 		synopsis: m.overview,
 		title: m.title,
 		vote_average: m.vote_average,
-		popularity: m.popularity,
-		backdrop_url: m.backdrop_path ? 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path : undefined,
-		poster_url: m.poster_path ? 'http://image.tmdb.org/t/p/w1280/'+m.poster_path : undefined,
+		popularity: m.popularity
 	};
+
+	if (!!m.backdrop_path) o.backdrop_url = 'http://image.tmdb.org/t/p/w1280/'+m.backdrop_path;
+	if (!!m.poster_path) o.poster_url = 'http://image.tmdb.org/t/p/w1280/'+m.poster_path;
+
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
 		if (err || !rec || rec.length < 1) return res.send(err);
 		fetchCast(rec, function (err, data) {

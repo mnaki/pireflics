@@ -20,10 +20,12 @@ module.exports = {
       type: 'text'
     },
     poster_url: {
-      type: 'string'
+      type: 'string',
+      defaultsTo: 'http://image.tmdb.org/t/p/w1280//oQWWth5AOtbWG9o8SCAviGcADed.jpg'
     },
     backdrop_url: {
-      type: 'string'
+      type: 'string',
+      defaultsTo: 'http://image.tmdb.org/t/p/w1280//XvJCJ5LBHTWQxsQN9Sddphp7xe.jpg'
     },
     title: {
       type: 'string'
