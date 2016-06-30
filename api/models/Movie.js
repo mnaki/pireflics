@@ -39,10 +39,6 @@ module.exports = {
     },
   	torrent: {
   	  model: 'torrent'
-  	},
-    viewers: {
-      collection: 'user',
-      via: 'movies'
-    }
+  	}
   }
 };

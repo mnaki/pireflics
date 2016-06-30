@@ -12,6 +12,9 @@
 		    <p><%= movie.synopsis %></p>
 		    <p>
 					<a href="/movie/play/<%= movie.id %>" class="btn btn-primary" role="button"><%= __('Play')%></a>
+					<% if (user.movies.includes(movie.id)) { %>
+						<a href="#" class="btn btn-primary" role="button"><%= __('Seen')%></a>
+					<% } %>
 				</p>
 	  </div>
 	</div>

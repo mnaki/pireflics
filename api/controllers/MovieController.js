@@ -98,7 +98,9 @@ module.exports = {
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
 			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
-			return res.view({ layout: false, movie: movie });
+			User.findOne(req.session.user.id, function (err, user) {
+				return res.view({ layout: false, movie: movie, user: user });
+			});
 		})
 	},
 
@@ -106,22 +108,30 @@ module.exports = {
 		movie = Movie.findOne({id: req.param('id')}).exec(function (err,movie) {
 			if (err || !movie) return res.serverError({str: 'could not find movie', error: err});
 			Comment.find({movie_id: movie.id}, function (err, comments) {
-				if (err) return;
-				movie.viewers.add(req.session.user.id);
-				movie.save(function (err) {
+				if (err) return res.json(err);
+				User.findOne(req.session.user.id, function (err, user) {
 					if (err) return res.json(err);
-					// return res.view('movie/play', { video: movie, comments: comments });
-					return res.json(movie);
-				})
+					if (!user.movies)
+						user.movies = [movie.id];
+					else
+						user.movies.push(movie.id);
+					user.save(function (err) {
+						if (err) return res.json(err);
+						// return res.view('movie/play', { video: movie, comments: comments });
+						return res.json(movie);
+					});
+				});
 			});
 		});
 	},
 
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user_id: req.session.user.firstname, movie_id: req.param('id')}).exec(function (err, result){
-			if(err){sails.log.debug(err)};
+			if (err) {
+				sails.log.debug(err);
+				return;
+			}
 			return res.redirect('/movie/play/'+req.param('id'));
 		})
-
 	}
 };

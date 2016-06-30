@@ -32,9 +32,8 @@ module.exports = {
           type: 'url'
       },
       movies: {
-        collection: 'movie',
-        via: 'viewers',
-        dominant: true
+        type: 'array',
+        defaultsTo: []
       }
   },
 
