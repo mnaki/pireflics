@@ -102,9 +102,16 @@ module.exports = {
 	play: function (req, res) {
 		movie = Movie.find({id: req.param('id')}).exec(function (err,results) {
 			if (err || results.length == 0) return res.serverError(err);
+			// fetch comments for this movie
 			Comment.find({movie_id: req.param('id')}, function (err, comments) {
-				if (err) return;
-				return res.view('movie/play', { video: results[0], comments: comments });
+				if (err) return res.serverError(err);
+
+				var video = results[0];
+				// pretify the date
+				video.release_date = moment(video.release_date).fromNow();
+				// truncate the synopsis
+				video.synopsis = _.truncate(video.synopsis, { 'length': 500 });
+				return res.view('movie/play', { video: video, comments: comments });
 			});
 		});
 	},
@@ -112,7 +119,7 @@ module.exports = {
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user_id: req.session.user.firstname, movie_id: req.param('id')}).exec(function (err, result){
 			if(err){sails.log.debug(err)};
-			return res.redirect('/movie/play/'+req.param('id'));
+			return res.redirect('/movie/play/' + req.param('id'));
 		})
 
 	}

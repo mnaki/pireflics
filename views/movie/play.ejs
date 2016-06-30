@@ -32,7 +32,32 @@
 </div>
 
 <div class="col-md-12">
-    <h4><%= __('Comments')%></h4>
+    <h2><%= __('Informations about')%> <%= video.title %></h2>
+    
+    <h5><%= __('Synopsis')%></h2>
+    <blockquote> <p> <%= video.synopsis %> </p> </blockquote>
+    
+    <h5><%= __('Date')%></h2>
+    <p> <%= video.release_date %> </p>
+    <h5><%= __('Vote')%></h2>
+    <p> <%= video.vote_average %> </p>
+    <h5><%= __('Synopsis')%></h2>
+    <p> <%= video.synopsis %> </p>
+    <h5><%= __('Casting')%></h2>
+    <div class="cast" style="overflow: auto">
+      <% video.cast.forEach(function(actor) {%>
+
+      <div class="card">
+        <img src="<%= 'http://image.tmdb.org/t/p/w1280/' + actor.profile_path %>">
+        <h3 class="actorname"> <%= actor.name %></h3>
+        <p><%= __('Character')%> : <br> <%= actor.character %> </p>
+      </div>
+      <%})%>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <h2><%= __('Comments')%></h2>
     <% comments.forEach(function(comment) {%>
     <div class="comment-block">
         <p>

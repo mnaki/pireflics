@@ -24,7 +24,8 @@ var mimeTypes = {
 	"mpv2":		"video/mpeg",
 	"mp2":		"video/mpeg",
 	"webm":		"video/webm",
-	"ogg":		"video/ogg"
+	"ogg":		"video/ogg",
+    "wmv":      "video/x-ms-wmv" // cannot be played
 };
 
 // used to store the engine already running to download file
@@ -47,7 +48,7 @@ module.exports = {
             return res.status(400);
 
 		Movie.find({ title: name }).populate('torrent').exec(function ( err, results ) {
-			if (err !== undefined ) {
+			if (err !== undefined && results.length > 0 ) {
 				var movie = results[0];
 
 				// if the torrent for this movie is already found
@@ -102,10 +103,11 @@ module.exports = {
              } else {
                 var torrent = results[0];
 
-
+                // if the torrent is already downloaded
                 if (torrent.download) 
-                   return res.json({ error: "already downloaded" });
+                   return res.json(torrent.toJSON());
                 
+                // if the engine is already downloading the torrent
 				else if (engines[torrent.id] !== undefined) 
 					return res.ok(torrent.toJSON());
 				
@@ -175,16 +177,14 @@ module.exports = {
 								
 								// transcode if its mkv
 								if (ext == "mkv") {
-
                                     ffmpeg(stream).fps(25).format('mp4')
                                     .on('end', function () {
                                         sails.log.debug("TorrentController | download | Download of torrent " + torrent.id + " is finished");
                                         torrent.download = true;
                                         
+										torrent.size = fs.statSync(path + '/' + target.name).size;
                                         fs.rename(path + '/' + target.name, path + '/' + target.name.replace(".mkv", ".mp4"));
-										
                                         torrent.path = torrent.path.replace(".mkv", ".mp4");
-										torrent.size = fs.statSync(torrent.path).size;
                                         torrent.save();
                                     })
                                     .save(path + '/' + target.name);
