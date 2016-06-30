@@ -15,6 +15,9 @@ module.exports = {
     search: function (req, res) {
         var id = req.params.id, lang = req.params.lang;
 
+        if (lang == "mine")
+            lang = req.session.user.default_language;
+
         Torrent.find({ id: id }).populate('subtitles', { lang: lang }).exec(function (err, records) {
             // check if we found a torrent for this id
             if ( err || records.length == 0) {

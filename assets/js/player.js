@@ -1,4 +1,5 @@
 var torrentID = null;
+var player = videojs("player");
 
 // Show modal
 
@@ -23,7 +24,19 @@ waitModalText.append("<p>> Searching for a torrent </p>");
 $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 
 	waitModalText.append("<p>> Found a torrent available, starting download </p>");
-	torrentID = data.id;
+	
+	// query for user subtitle
+	$.get("/torrent/" + data.id + "/subtitle/mine").done(function (subtitle) {
+		if (subtitle.lang !== "en") {
+			player.addRemoteTextTrack({
+				kind: "captions",
+				lang: subtitle.lang,
+				label: subtitle.lang,
+				src: "/videos/" + data.id + "/" + subtitle.lang + ".vtt"
+			})
+		}
+	});
+	
 	// start the download
 	$.get("/torrent/" + data.id + "/download").done(function (torrent) {
 
@@ -43,7 +56,6 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 						$('#waitModal').modal('hide');
 						
 						// setup the player
-						var player = videojs("player");
 						player.pause();
 						player.src([
 							{ type: torrent.mime, src: "/torrent/" + data.id + "/stream" }
@@ -51,7 +63,7 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 						player.addRemoteTextTrack({
 							kind: "captions",
 							lang: "en",
-							label: "english",
+							label: "en",
 							src: "/videos/" + data.id + "/en.vtt"
 						})
 						$("#div_video").removeClass("vjs-playing").addClass("vjs-paused");
@@ -70,7 +82,6 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 			$('#waitModal').modal('hide');
 			
 			// setup the player
-			var player = videojs("player");
 			player.pause();
 			player.src([
 				{ type: torrent.mime, src: "/torrent/" + data.id + "/stream" }
@@ -78,7 +89,7 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 			player.addRemoteTextTrack({
 				kind: "captions",
 				lang: "en",
-				label: "english",
+				label: "en",
 				src: "/videos/" + data.id + "/en.vtt"
 			})
      		$("#div_video").removeClass("vjs-playing").addClass("vjs-paused");
