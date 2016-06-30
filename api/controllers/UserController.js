@@ -8,6 +8,12 @@ var bcrypt = require('bcryptjs');
 
 module.exports = {
 
+    _config: {
+        actions: false,
+        shortcuts: false,
+        rest: false
+    },
+
     create: function(req, res) {
         User.create(req.body).exec(function(err, result){
             if (err) {
@@ -139,6 +145,21 @@ module.exports = {
                 }
             })
         });
-    }
+    },
+
+    findOne: function (req, res) {
+        var id = req.params.id;
+
+        if (id == undefined)   
+            return res.notFound();
+
+        User.find({ id: id }).exec(function (err, records) {
+            if (err || records.length == 0)
+                return res.notFound();
+            else {
+                res.view('user/other_profil', { user: records[0] });
+            }
+        });
+    } 
 };
 

@@ -95,7 +95,10 @@ module.exports.routes = {
 
   '/update_picture' : 'UserController.edit_picture',
 
-  '/update_info' : 'Usercontroller.edit_info'
+  '/update_info' : 'Usercontroller.edit_info',
+
+  'get /user/:id' : 'UserController.findOne'
+
 
 
 /***************************************************************************
