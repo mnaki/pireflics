@@ -8,11 +8,6 @@
 var passport = require('passport');
 
 module.exports = {
-    _config: {
-        actions: false,
-        shortcuts: false,
-        rest: false
-    },
 
     login: function(req, res) {
         passport.authenticate('local', function(err, user, info) {
@@ -74,9 +69,10 @@ module.exports = {
     },
 
     logout: function(req, res) {
-        req.session.user = null;
-        req.logout();
-        res.redirect('/');
+		// be sure about destroying a session
+        req.session.destroy(function(err) {
+           return res.redirect('/');
+      	});
     }
 };
 

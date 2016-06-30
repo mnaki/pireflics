@@ -8,16 +8,10 @@ var bcrypt = require('bcryptjs');
 
 module.exports = {
 
-    _config: {
-        actions: false,
-        shortcuts: false,
-        rest: false
-    },
-
     create: function(req, res) {
         User.create(req.body).exec(function(err, result){
             if (err) {
-                //Handle Error
+                res.serverError();
             }
             return res.redirect('/auth/login')
         });
