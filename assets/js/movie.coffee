@@ -35,8 +35,11 @@ window.onload = ->
       nextPage()
   , 3000)
 
-  # onUserInput = ->
-  #   $('.video-list').html ''
-  #   $('.searchform .movieName').submit()
+  onUserInput = ->
+    $('.video-list').html ''
+    $('.searchform .movieName').submit()
+
+  # $('.searchform .movieName').keyup _.throttle(onUserInput, 3000)
+  $('.searchform').change onUserInput
 
   search('')

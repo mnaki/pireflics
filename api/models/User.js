@@ -31,7 +31,7 @@ module.exports = {
       image : {
           type: 'url'
       },
-      viewed_movies: {
+      movies: {
         collection: 'movie',
         via: 'viewers',
         dominant: true

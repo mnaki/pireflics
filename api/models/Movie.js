@@ -34,15 +34,15 @@ module.exports = {
     popularity: {
       type: 'float'
     },
-    viewers: {
-      collection: 'user',
-      via: 'viewed_movies'
-    },
     cast: {
       type: 'json'
     },
   	torrent: {
   	  model: 'torrent'
-  	}
+  	},
+    viewers: {
+      collection: 'user',
+      via: 'movies'
+    }
   }
 };

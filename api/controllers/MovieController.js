@@ -103,11 +103,16 @@ module.exports = {
 	},
 
 	play: function (req, res) {
-		movie = Movie.find({id: req.param('id')}).exec(function (err,results) {
-			if (err || results.length == 0) return res.serverError(err);
-			Comment.find({movie_id: req.param('id')}, function (err, comments) {
+		movie = Movie.findOne({id: req.param('id')}).exec(function (err,movie) {
+			if (err || !movie) return res.serverError({str: 'could not find movie', error: err});
+			Comment.find({movie_id: movie.id}, function (err, comments) {
 				if (err) return;
-				return res.view('movie/play', { video: results[0], comments: comments });
+				movie.viewers.add(req.session.user.id);
+				movie.save(function (err) {
+					if (err) return res.json(err);
+					// return res.view('movie/play', { video: movie, comments: comments });
+					return res.json(movie);
+				})
 			});
 		});
 	},
