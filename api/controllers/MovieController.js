@@ -109,7 +109,7 @@ module.exports = {
 		})
 	},
 
-	/*play: function (req, res) {
+	play: function (req, res) {
 		if (!req.session || !req.session.user)
 			return res.forbidden({error: 'Not logged in'});
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
@@ -133,41 +133,6 @@ module.exports = {
 				});
 			});
 		});
-	},*/
-
-	// No more callback hell
-	play: function (req, res) {
-		if (!req.session || !req.session.user) return res.forbidden({error: 'Not logged in'});
-
-		var movie;
-		var coments;
-
-		return async.waterfall([
-			function (cb) {
-				Movie.findOne({id: req.param('id')}).exec(cb);
-			},
-			function (movie_, cb) {
-				if (!movie_) return res.serverError({message: 'could not find movie'});
-				movie = movie_;
-				Comment.find({movie_id: movie.id}).populate('user').exec(cb);
-			},
-			function (comments_, cb) {
-				if (!comments_) return res.serverError({message: 'comment error'});
-				comments = comments_;
-				User.findOne(req.session.user.id).exec(cb);
-			}],
-			function (err, user) {
-				if (err || !user) return res.serverError(err);
-				if (!user.movies) user.movies = [movie.id];
-				else user.movies.push(movie.id);
-				return user.save(function (err) {
-					if (err) return res.json(err);
-					movie.release_date = moment(movie.release_date).fromNow(); // pretify the date
-					movie.synopsis = _.truncate(movie.synopsis, { 'length': 500 }); // truncate the synopsis
-					return res.view('movie/play', { video: movie, comments: comments });
-				})
-			}
-		)
 	},
 
 	add_comment: function(req, res){
