@@ -61,7 +61,7 @@
     <% comments.forEach(function(comment) {%>
     <div class="comment-block">
         <p>
-            <small><%= comment.user_id %> <%= __('said') %> :</small>
+            <a href="<%= '/user/' + comment.user.id %>"><small><%= comment.user.firstname + ' ' + comment.user.lastname %> <%= __('said') %> :</small></a>
             <%= comment.comment %>
         </p>
     </div>

@@ -31,7 +31,7 @@ window.onload = ->
     search $('.searchform .movieName').val()
 
   $(window).scroll _.throttle(->
-    if $(window).scrollTop() + $(window).height() > $(document).height() - 100
+    if $(window).scrollTop() + $(window).height() > $(document).height() - 80
       nextPage()
   , 3000)
 

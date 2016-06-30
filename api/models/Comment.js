@@ -16,8 +16,8 @@ module.exports = {
       type: 'string',
       required: true
     },
-    user_id:{
-      type: 'string',
+    user:{
+      model: 'user',
       required: true
     }
   }

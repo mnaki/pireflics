@@ -109,7 +109,8 @@ module.exports = {
 	play: function (req, res) {
 		movie = Movie.findOne({id: req.param('id')}).exec(function (err,movie) {
 			if (err || !movie) return res.serverError({str: 'could not find movie', error: err});
-			Comment.find({movie_id: movie.id}, function (err, comments) {
+
+			Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
 				if (err) return res.json(err);
 				User.findOne(req.session.user.id, function (err, user) {
 					if (err) return res.json(err);
@@ -131,7 +132,7 @@ module.exports = {
 	},
 
 	add_comment: function(req, res){
-		Comment.create({comment: req.param('comment'), user_id: req.session.user.firstname, movie_id: req.param('id')}).exec(function (err, result){
+		Comment.create({comment: req.param('comment'), user: req.session.user.id, movie_id: req.param('id')}).exec(function (err, result){
 			if (err) {
 				sails.log.debug(err);
 				return;
