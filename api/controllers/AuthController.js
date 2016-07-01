@@ -27,7 +27,7 @@ module.exports = {
     },
 
 	facebook: function(req, res) {
-        passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/auth/login', scope: ['public_profile','email']}, function(err, user, info) {
+        passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/auth/login', scope: ['public_profile','email', 'picture']}, function(err, user, info) {
             if (err || !user) {
 				// handle error 
                 return res.send({
@@ -48,7 +48,7 @@ module.exports = {
     },
 
     duoquadra: function(req, res) {
-        passport.authenticate('oauth2', { successRedirect: '/', failureRedirect: '/auth/login', scope: ['public_profile','email']}, function(err, user, info) {
+        passport.authenticate('oauth2', { successRedirect: '/', failureRedirect: '/auth/login', scope: ['public_profile','email', 'picture']}, function(err, user, info) {
             if (err || !user) {
 				// handle error 
                 return res.send({

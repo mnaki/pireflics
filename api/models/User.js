@@ -48,7 +48,7 @@ module.exports = {
         bcrypt.genSalt(10, function(err, salt) {
 			bcrypt.hash(user.pwd, salt, function(err, hash) {
 				if (err) {
-					console.log(err);
+					sails.log.debug("Cant hash a password");
 					cb(err);
 				} else {
 					user.pwd = hash;
