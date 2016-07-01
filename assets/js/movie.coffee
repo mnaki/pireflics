@@ -2,14 +2,17 @@ currentPage = 1
 
 window.onload = ->
   populateList = (movies) ->
-    $.each movies, (key, val) ->
-      if val.id
-        $.ajax
-          url: '/movie/partial/'+val.id
-          success: (partialData) ->
-            $('.video-list').append partialData
-          error: (err) ->
-            # console.log err
+    if movies.length <= 0 || movies == {}
+      alert 'Wait a minute!'
+    else
+      $.each movies, (key, val) ->
+        if val.id
+          $.ajax
+            url: '/movie/partial/'+val.id
+            success: (partialData) ->
+              $('.video-list').append partialData
+            error: (err) ->
+              # console.log err
 
   getForm = ->
     {
@@ -50,7 +53,7 @@ window.onload = ->
     search $('.searchform .movieName').val()
 
   $(window).scroll _.throttle(->
-    if $(window).scrollTop() + $(window).height() > $(document).height() - 80
+    if $(window).scrollTop() + $(window).height() > $(document).height() - $(window).height()
       nextPage()
   , 3000)
 

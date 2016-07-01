@@ -38,6 +38,10 @@ module.exports.routes = {
     view: 'homepage'
   },
 
+  '/error': {
+    view: 'error'
+  },
+
   // Movie Controller
   'get /movie/search': 'MovieController.search',
   'get /movie/partial/:id': 'MovieController.partial',
@@ -86,7 +90,7 @@ module.exports.routes = {
   '/lost_password': {
     view: 'user/lost_password'
   },
-  
+
   '/send_reset_pwd': 'UserController.send_reset_pwd',
 
   '/new_pwd': 'UserController.new_pwd',
@@ -99,9 +103,7 @@ module.exports.routes = {
 
   'get /user/:id' : 'UserController.findOne',
 
-  'post /user' : 'UserController.create'
-
-
+  'post /user' : 'UserController.create',
 
 /***************************************************************************
   *                                                                          *
