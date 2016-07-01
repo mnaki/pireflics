@@ -48,7 +48,7 @@
       <% video.cast.forEach(function(actor) {%>
 
       <div class="card">
-        <img src="<%= 'http://image.tmdb.org/t/p/w1280/' + actor.profile_path %>">
+        <img src="<%= actor.profile_path ? 'http://image.tmdb.org/t/p/w1280/' + actor.profile_path : '/images/defaultprofil.gif' %>">
         <h3 class="actorname"> <%= actor.name %></h3>
         <p><%= __('Character')%> : <br> <%= actor.character %> </p>
       </div>

@@ -9,62 +9,61 @@ var bcrypt = require('bcryptjs');
 module.exports = {
 
     create: function(req, res) {
-        User.find({ mail: req.body.email }).exec(function ( err, users) {
-             if (err) 
-                    return res.serverError();
+        if (req.body.email == undefined || req.body.firstname == undefined || req.body.lastname == undefined)
+            return res.badRequest();
+
+        User.find({ email: req.body.email }).exec(function ( err, users) {
+            if (err)
+                return res.badRequest(err);
             if (users.length === 0) {
                 // if the mail not exist
                 User.create(req.body).exec(function(err, result){
                     if (err) 
-                        return res.serverError();
+                        return res.badRequest(err);
                     
                     return res.redirect('/auth/login')
                 });
-            }
+            } 
             // else error
-            return res.badRequest({ error: " email already used "});
+            else
+                return res.badRequest({ error: " email already used "});
         })
     },
     
     my_profil : function (req, res){
-        if(req.user)
-            res.view('user/my_profil');
-        else
-            res.redirect('/auth/login');
+        res.view('user/my_profil');
     },
+
     edit_picture : function(req,res){
         if(req.user){
             User.update({ id : req.session.user.id }, { image : req.param('picture') }).exec(function afterupdate(err, updated){
                 if (err) return res.serverError(err);
                 req.session.user.image = req.param('picture');
-                res.redirect('user/my_profil');
+                res.redirect('/my_profil');
             });
         }
         else
             res.redirect('/auth/login');
     },
     edit_info : function (req, res){
-        if(req.user) {
-            User.update({ id : req.session.user.id }, { firstname : req.param('firstname'),
-                                                        lastname : req.param('lastname'),
-                                                        email : req.param('email'),
-                                                        default_language : req.param('lang')}).exec(function afterupdate(err, updated){
-                if (err){
-                    console.log(err.code);
-                    req.session.msg = err.code;
-                    res.redirect('user/my_profil');
-                }
-                else {
-                    req.session.user.lastname = req.param('lastname');
-                    req.session.user.firstname = req.param('firstname');
-                    req.session.user.email = req.param('email');
-                    req.session.user.default_language = req.param('lang');
-                    res.redirect('user/my_profil');
-                }
+            User.update({ id : req.session.user.id }, 
+                { firstname : req.param('firstname'),
+                lastname : req.param('lastname'),
+                email : req.param('email'),
+                default_language : req.param('lang')}).exec(function (err, updated) {
+                    if (err){
+                        console.log(err.code);
+                        req.session.msg = err.code;
+                        res.redirect('my_profil');
+                    }
+                    else {
+                        req.session.user.lastname = req.param('lastname');
+                        req.session.user.firstname = req.param('firstname');
+                        req.session.user.email = req.param('email');
+                        req.session.user.default_language = req.param('lang');
+                        res.redirect('my_profil');
+                    }
             });
-        }
-        else
-            res.redirect('/auth/login');
     },
     send_reset_pwd: function(req, res) {
 
@@ -88,7 +87,7 @@ module.exports = {
                             senderName: "Admin"
                         },
                         {
-                            to: "valentin.klepper@gmail.com",
+                            to: req.param('email'),
                             subject: "Hi there"
                         },
                         function(err) {sails.log.debug(err || "Email for reset password sended !");}

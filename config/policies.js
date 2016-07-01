@@ -42,7 +42,11 @@ module.exports.policies = {
   },
   'UserController': {
     '*': 'isAuthenticated',
-    'create': true
+    'create': true,
+    'send_reset_pwd': true,
+    'reset_pwd': true,
+    'new_pwd': true
+
   },
   'SubtitleController': {
     '*': 'isAuthenticated'

@@ -64,14 +64,8 @@ var sendCachedMovies = function (data, req, res) {
 			movies = _.flatten(movies, 1);
 			movies = _.pickBy(movies, function (m) {
 				var year = Number(m.release_date.toISOString().split('-')[0]);
-				// sails.log.debug([
-				// 	year,
-				// 	req.param('yearFrom'),
-				// 	req.param('yearTo'),
-				// 	]);
 				return year >= req.param('yearFrom') && year <= req.param('yearTo');
 			});
-
 			return async.sortBy(movies, function (movie, cb) {
 				sails.log.info(movie[req.param('sortBy')]);
 				cb(null, movie[req.param('sortBy')]);
