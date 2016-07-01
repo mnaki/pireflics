@@ -9,7 +9,7 @@
 		  <div class="caption">
 		    <h3><%= movie.title %></h3>
 				<h4><%= movie.release_date %></h4>
-				<h4><%= __('Rate')%> : <%= movie.vote_average %></h4>
+				<h4><%= __('Average rating')%> : <%= movie.vote_average %></h4>
 		    <p clas='synopsis'><%= movie.synopsis %></p>
 		    <p>
 					<a href="/movie/play/<%= movie.id %>" class="btn btn-primary" role="button"><%= __('Play')%></a>
