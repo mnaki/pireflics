@@ -26,7 +26,7 @@ var cacheMovies = function (m, callback) {
 	if (!!m.poster_path) o.poster_url = 'http://image.tmdb.org/t/p/w1280/'+m.poster_path;
 
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
-		if (err || !rec || rec.length < 1) return res.send(err);
+		if (err || !rec || rec.length < 1) return res.serverError(err);
 		fetchCast(rec, function (err, data) {
 			// TODO
 			if (err) sails.log.debug({error: err, movie: data});
@@ -60,15 +60,24 @@ var sendCachedMovies = function (data, req, res) {
 		data.results,
 		cacheMovies,
 		function (err, movies) {
-			if (err) return res.send(err);
+			if (err) return res.serverError(err);
 			movies = _.flatten(movies, 1);
-			movies = _.sortBy(movies, req.param('sortby'));
 			movies = _.pickBy(movies, function (m) {
-				var date = m.release_date.toISOString().split('-')[0];
-				return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
+				var year = Number(m.release_date.toISOString().split('-')[0]);
+				// sails.log.debug([
+				// 	year,
+				// 	req.param('yearFrom'),
+				// 	req.param('yearTo'),
+				// 	]);
+				return year >= req.param('yearFrom') && year <= req.param('yearTo');
 			});
-			if (req.param('order') == 'desc') movies = _.reverse(movies);
-			return res.json(movies);
+
+			return async.sortBy(movies, function (movie, cb) {
+				sails.log.info(movie[req.param('sortBy')]);
+				cb(null, req.param('order') == 'asc' ? -movie[req.param('sortBy')] : movie[req.param('sortBy')]);
+			}, function (err, movies) {
+				return res.json(movies);
+			})
 		}
 	);
 }
@@ -85,7 +94,7 @@ module.exports = {
 		try
 		{
 			get(url).asBuffer(function(err, data) {
-				if (err) return res.send(err);
+				if (err) return res.serverError(err);
 				return sendCachedMovies(JSON.parse(data), req, res);
 			});
 		}
@@ -107,7 +116,7 @@ module.exports = {
 			try
 			{
 				get(url).asBuffer(function(err, data) {
-					if (err) return res.send(err);
+					if (err) return res.serverError(err);
 					return sendCachedMovies(JSON.parse(data), req, res);
 				});
 			}
@@ -117,7 +126,7 @@ module.exports = {
 
 	partial: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			if (err || !movie) return res.send(err);
+			if (err || !movie) return res.serverError(err);
 			// pretify the date
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
@@ -125,7 +134,7 @@ module.exports = {
 			// if (!req.session || !req.session.user)
 			// 	return res.forbidden('User is not logged in');
 			User.findOne(req.session.user.id, function (err, user) {
-				if (err || !user) return res.send(err);
+				if (err || !user) return res.serverError(err);
 				return res.view({ layout: false, movie: movie, user: user });
 			});
 		})
@@ -135,13 +144,13 @@ module.exports = {
 		// if (!req.session || !req.session.user)
 		// 	return res.forbidden('User is not logged in');
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			if (err || !movie) return res.send(err);
+			if (err || !movie) return res.serverError(err);
 			if (!movie.cast || movie.cast == {})
 				return res.forbidden('Movie is still under process, try again later');
 			Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
-				if (err || !comments) return res.send(err);
+				if (err || !comments) return res.serverError(err);
 				User.findOne(req.session.user.id, function (err, user) {
-					if (err || !user) return res.send(err);
+					if (err || !user) return res.serverError(err);
 					if (!user.movies)
 						user.movies = [movie.id];
 					else
@@ -162,7 +171,7 @@ module.exports = {
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user: req.session.user.id, movie_id: req.param('id')}).exec(function (err, result){
 			if (err || !result || result.length < 1) {
-				return res.send(err);
+				return res.serverError(err);
 			}
 			return res.redirect('/movie/play/'+req.param('id'));
 		})
