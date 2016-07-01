@@ -64,19 +64,16 @@ var sendCachedMovies = function (data, req, res) {
 			movies = _.flatten(movies, 1);
 			movies = _.pickBy(movies, function (m) {
 				var year = Number(m.release_date.toISOString().split('-')[0]);
-				// sails.log.debug([
-				// 	year,
-				// 	req.param('yearFrom'),
-				// 	req.param('yearTo'),
-				// 	]);
 				return year >= req.param('yearFrom') && year <= req.param('yearTo');
 			});
-
 			return async.sortBy(movies, function (movie, cb) {
 				sails.log.info(movie[req.param('sortBy')]);
-				cb(null, req.param('order') == 'asc' ? -movie[req.param('sortBy')] : movie[req.param('sortBy')]);
+				cb(null, movie[req.param('sortBy')]);
 			}, function (err, movies) {
-				return res.json(movies);
+				if (req.param('order') == 'asc')
+					return res.json(_.reverse(movies));
+				if (req.param('order') == 'desc')
+					return res.json(movies);
 			})
 		}
 	);
