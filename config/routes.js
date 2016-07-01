@@ -57,7 +57,7 @@ module.exports.routes = {
   // Search a subtitle for this torrent
   'get /torrent/:id/subtitle/:lang': 'SubtitleController.search',
 
-  '/auth/login': {
+  'get /auth/login': {
     view: 'user/connexion'
   },
 
@@ -97,7 +97,9 @@ module.exports.routes = {
 
   '/update_info' : 'Usercontroller.edit_info',
 
-  'get /user/:id' : 'UserController.findOne'
+  'get /user/:id' : 'UserController.findOne',
+
+  'post /user' : 'UserController.create'
 
 
 

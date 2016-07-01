@@ -45,9 +45,9 @@ module.exports.connections = {
    mysqlserver: {
     adapter: 'sails-mysql',
     host: 'status.hardfight.fr',
-    user: 'test',
+    user: 'hypertube',
     password: '', //optional
-    database: 'test' //optional
+    database: 'hypertube' //optional
   },
 
   /***************************************************************************

@@ -9,12 +9,21 @@ var bcrypt = require('bcryptjs');
 module.exports = {
 
     create: function(req, res) {
-        User.create(req.body).exec(function(err, result){
-            if (err) {
-                res.serverError();
+        User.find({ mail: req.body.email }).exec(function ( err, users) {
+             if (err) 
+                    return res.serverError();
+            if (users.length === 0) {
+                // if the mail not exist
+                User.create(req.body).exec(function(err, result){
+                    if (err) 
+                        return res.serverError();
+                    
+                    return res.redirect('/auth/login')
+                });
             }
-            return res.redirect('/auth/login')
-        });
+            // else error
+            return res.badRequest({ error: " email already used "});
+        })
     },
     
     my_profil : function (req, res){

@@ -41,7 +41,8 @@ module.exports.policies = {
     '*': 'isAuthenticated'
   },
   'UserController': {
-    '*': 'isAuthenticated'
+    '*': 'isAuthenticated',
+    'create': true
   },
   'SubtitleController': {
     '*': 'isAuthenticated'
