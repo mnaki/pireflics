@@ -11,27 +11,28 @@ window.onload = ->
           error: (err) ->
             # console.log err
 
+  getForm = ->
+    {
+      sortBy: $('#sortBy').val(),
+      order: $('#order').val(),
+      page: currentPage,
+      yearFrom: $('#yearFrom').val(),
+      yearTo: $('#yearTo').val(),
+    }
+
   search = (searchText) ->
     try
       if $('.searchform .movieName').val() == ''
-        $.getJSON '/movie/popular', { page: currentPage }, (movies) ->
-          populateList movies
         $.ajax
           url: '/movie/popular'
-          data: { page: currentPage }
+          data: getForm()
           success: (movies) -> populateList movies
           error: (err) ->
             # console.log err
       else
         $.ajax
           url: '/movie/search/' + searchText
-          data: {
-            sortBy: $('#sortby').val(),
-            order: $('#order').val(),
-            page: currentPage,
-            yearFrom: $('#yearFrom').val(),
-            yearTo: $('#yearTo').val(),
-          }
+          data: getForm()
           success: (movies) -> populateList movies
           error: (err) ->
             # console.log err
