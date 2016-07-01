@@ -26,7 +26,11 @@ var cacheMovies = function (m, callback) {
 	if (!!m.poster_path) o.poster_url = 'http://image.tmdb.org/t/p/w1280/'+m.poster_path;
 
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
+<<<<<<< HEAD
 		if (err || !rec || rec.length < 1) return res.json(err);
+=======
+		if (err || !rec || rec.length < 1) return res.serverError(err);
+>>>>>>> 73d6f3587f90336382e4b7679ba78d6bf7a9aa3a
 		fetchCast(rec, function (err, data) {
 			// TODO
 			if (err) sails.log.debug({error: err, movie: data});
