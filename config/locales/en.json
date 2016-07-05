@@ -31,5 +31,6 @@
 	"Ascending": "Ascending",
 	"Comments": "Comments",
 	"said": "said",
-	"Your comment": "Your comment"
+	"Your comment": "Your comment",
+	"APILIMIT": "No result or API Rate limit exceeded"
 }

@@ -2,17 +2,17 @@ currentPage = 1
 
 window.onload = ->
   populateList = (movies) ->
-    if movies.length <= 0 || movies == {}
-      alert 'Wait a minute!'
-    else
+    if movies.err
+      alert JSON.stringify(movies.err.msg)
+    else if movies && movies.length > 0
       $.each movies, (key, val) ->
         if val.id
           $.ajax
             url: '/movie/partial/'+val.id
             success: (partialData) ->
               $('.video-list').append partialData
-            error: (err) ->
-              # console.log err
+            error: (xhr, ajaxOpt, err) ->
+              # console.log xhr + ajaxOpt + err
 
   getForm = ->
     {
@@ -25,20 +25,16 @@ window.onload = ->
 
   search = (searchText) ->
     try
-      if $('.searchform .movieName').val() == ''
-        $.ajax
-          url: '/movie/popular'
-          data: getForm()
-          success: (movies) -> populateList movies
-          error: (err) ->
-            # console.log err
+      if searchText != ''
+        url = '/movie/search/' + searchText + '/'
       else
-        $.ajax
-          url: '/movie/search/' + searchText
-          data: getForm()
-          success: (movies) -> populateList movies
-          error: (err) ->
-            # console.log err
+        url = '/movie/popular'
+      $.ajax
+        url: url
+        data: getForm()
+        success: (movies) -> populateList movies
+        error: (xhr, ajaxOpt, err) ->
+          # console.log xhr + ajaxOpt + err
     catch error
       # console.log error
 

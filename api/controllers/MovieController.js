@@ -29,7 +29,8 @@ var cacheMovies = function (m, callback) {
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
 		if (err || !rec || rec.length < 1) {
 			sails.log.debug([m.title, 'findOrCreate', err])
-			return res.redirect('/error', err);
+			req.session.msg = err;
+			return res.redirect('/error');
 		}
 		fetchCast(rec, function (err, data) {
 			if (err) {
@@ -68,7 +69,7 @@ var sendCachedMovies = function (data, req, res) {
 		function (err, movies) {
 			if (err) {
 				sails.log.debug(['sendCachedMovies', err]);
-				return res.redirect('/error', err);
+				return res.json({err: {msg}});
 			}
 			sails.log.debug('chaining methods')
 			movies = _.chain(movies)
@@ -103,7 +104,10 @@ module.exports = {
 		try
 		{
 			get(url).asBuffer(function(err, data) {
-				if (err) return res.redirect('/error', err);
+				if (err) {
+					req.session.msg = err;
+					return res.redirect('/error');
+				}
 				return sendCachedMovies(JSON.parse(data), req, res);
 			});
 		}
@@ -123,25 +127,35 @@ module.exports = {
 			var url = 'http://api.themoviedb.org/3/search/movie/?'+queryString.stringify(query);
 			try
 			{
-				get(url).asBuffer(function(err, data) {
+				get(url).asBuffer(function(e, data) {
 					sails.log.debug(url)
-					if (err) return res.redirect('/error', err);
+					if (e) {
+						req.session.msg = e;
+						return res.json({err:{msg:e}});
+					}
 					return sendCachedMovies(JSON.parse(data), req, res);
 				});
 			}
-			catch (e) { return res.redirect('/error', e); }
+			catch (e) { return res.json({err:{msg:e}}) }
 		}
 	},
 
 	partial: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			if (err || !movie) return res.redirect('/error', err);
+			if (err || !movie) {
+					req.session.msg = err;
+					return res.redirect('/error');
+			}
 			// pretify the date
 			movie.release_date = moment(movie.release_date).fromNow();
 			// truncate the synopsis
-			movie.synopsis = _.truncate(movie.synopsis, { 'length': 200 });
+			movie.synopsis = _.truncate(movie.synopsis, { 'length': 140 });
 			User.findOne(req.session.user.id, function (err, user) {
-				if (err || !user) return res.redirect('/error', err);
+
+				if (err || !user) {
+					req.session.msg = err;
+					return res.redirect('/error');
+				}
 				return res.view({ layout: false, movie: movie, user: user });
 			});
 		})
@@ -149,19 +163,31 @@ module.exports = {
 
 	play: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
-			if (err || !movie) return res.redirect('/error', err);
+			if (err || !movie) {
+				req.session.msg = err;
+				return res.redirect('/error');
+			}
 			if (!movie.cast || movie.cast == {})
 				return res.forbidden('Movie is still under process, try again later');
 			Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
-				if (err || !comments) return res.redirect('/error', err);
+				if (err || !comments) {
+					req.session.msg = err;
+					return res.redirect('/error');
+				}
 				User.findOne(req.session.user.id, function (err, user) {
-					if (err || !user) return res.redirect('/error', err);
+					if (err || !user) {
+							req.session.msg = err;
+							return res.redirect('/error');
+					}
 					if (!user.movies)
 						user.movies = [movie.id];
 					else
 						user.movies.push(movie.id);
 					user.save(function (err) {
-						if (err) return res.redirect('/error', err);
+						if (err) {
+							req.session.msg = err;
+							return res.redirect('/error');
+						}
 						// pretify the date
 						movie.release_date = moment(movie.release_date).fromNow();
 						// truncate the synopsis
@@ -176,7 +202,8 @@ module.exports = {
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user: req.session.user.id, movie_id: req.param('id')}).exec(function (err, result){
 			if (err || !result || result.length < 1) {
-				return res.redirect('/error', err);
+				req.session.msg = err;
+				return res.redirect('/error');
 			}
 			return res.redirect('/movie/play/'+req.param('id'));
 		})

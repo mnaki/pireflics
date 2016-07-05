@@ -38,5 +38,6 @@
 	"Informations about": "Informations a propos de ",
 	"Casting": "Acteurs",
 	"Character": "Personnage",
-	"Loading": "Chargement"
+	"Loading": "Chargement",
+	"APILIMIT": "Pas de résultats / Trop de requêtes API"
 }
