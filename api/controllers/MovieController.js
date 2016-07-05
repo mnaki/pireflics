@@ -13,6 +13,7 @@ var async = require('async');
 var moment = require('moment');
 
 var cacheMovies = function (m, callback) {
+	sails.log.debug(m.title)
 	var o = {
 		imdb_id: m.id,
 		release_date: m.release_date,
@@ -26,10 +27,17 @@ var cacheMovies = function (m, callback) {
 	if (!!m.poster_path) o.poster_url = 'http://image.tmdb.org/t/p/w1280/'+m.poster_path;
 
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
-		if (err || !rec || rec.length < 1) return res.redirect('/error', err);
+		if (err || !rec || rec.length < 1) {
+			sails.log.debug([m.title, 'findOrCreate', err])
+			return res.redirect('/error', err);
+		}
 		fetchCast(rec, function (err, data) {
-			if (err) return err;
+			if (err) {
+				sails.log.debug([m.title, 'fetchCast', err])
+				return err;
+			}
 		});
+		sails.log.debug([m.title, 'success'])
 		return callback(null, rec);
 	});
 };
@@ -50,7 +58,7 @@ var fetchCast = function (m, callback) {
 			return Movie.update({imdb_id: m.imdb_id}, {cast: cast}).exec(callback);
 		});
 	}
-	catch (e) { return callback(new Error(e)); }
+	catch (e) { return callback(e); }
 };
 
 var sendCachedMovies = function (data, req, res) {
@@ -58,15 +66,19 @@ var sendCachedMovies = function (data, req, res) {
 		data.results,
 		cacheMovies,
 		function (err, movies) {
-			if (err) return res.redirect('/error', err);
+			if (err) {
+				sails.log.debug(['sendCachedMovies', err]);
+				return res.redirect('/error', err);
+			}
 			movies = _.flatten(movies, 1);
 			movies = _.sortBy(movies, req.param('sortBy'));
 			movies = _.pickBy(movies, function (m) {
-				if (m.releaes_date == undefined || m.release_date == null)
+				if (m.release_date == undefined || m.release_date == null)
 					return false;
 				var date = m.release_date.toISOString().split('-')[0];
 				return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
 			});
+			sails.log.debug('movies.length = ' + movies.length);
 			if (req.param('order') == 'desc') movies = _.reverse(movies);
 			return res.json(movies);
 		}
@@ -89,7 +101,7 @@ module.exports = {
 				return sendCachedMovies(JSON.parse(data), req, res);
 			});
 		}
-		catch (e) { return res.redirect('/error', new Error(e)); }
+		catch (e) { return res.redirect('/error', e); }
 	},
 
 	search: function (req, res) {
@@ -106,11 +118,12 @@ module.exports = {
 			try
 			{
 				get(url).asBuffer(function(err, data) {
+					sails.log.debug(url)
 					if (err) return res.redirect('/error', err);
 					return sendCachedMovies(JSON.parse(data), req, res);
 				});
 			}
-			catch (e) { return res.redirect('/error', new Error(e)); }
+			catch (e) { return res.redirect('/error', e); }
 		}
 	},
 
