@@ -71,19 +71,16 @@ var sendCachedMovies = function (data, req, res) {
 				sails.log.debug(['sendCachedMovies', err]);
 				return res.json({err:{msg:e}});
 			}
-			sails.log.debug('chaining methods')
 			movies = _.chain(movies)
 				.sortBy(req.param('sortBy'))
-				.each((m)=>console.log(m[req.param('sortBy')]))
 				.pickBy(function (m) {
-					if (m.release_date == undefined || m.release_date == null)
+					if (!m.release_date || !_.isFunction(m.release_date.toISOString))
 						return false;
 					var date = m.release_date.toISOString().split('-')[0];
 					return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
 				})
 				.toArray()
 				.value();
-			sails.log.debug(movies)
 			sails.log.debug('movies.length = ' + _.size(movies));
 			sails.log.debug('order = ' + req.param('order'));
 			if (req.param('order') == 'desc') return res.json(_.reverse(movies));
