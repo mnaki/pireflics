@@ -70,16 +70,22 @@ var sendCachedMovies = function (data, req, res) {
 				sails.log.debug(['sendCachedMovies', err]);
 				return res.redirect('/error', err);
 			}
-			movies = _.flatten(movies, 1);
-			movies = _.sortBy(movies, req.param('sortBy'));
-			movies = _.pickBy(movies, function (m) {
-				if (m.release_date == undefined || m.release_date == null)
-					return false;
-				var date = m.release_date.toISOString().split('-')[0];
-				return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
-			});
-			sails.log.debug('movies.length = ' + movies.length);
-			if (req.param('order') == 'desc') movies = _.reverse(movies);
+			sails.log.debug('chaining methods')
+			movies = _.chain(movies)
+				.sortBy(req.param('sortBy'))
+				.each((m)=>console.log(m[req.param('sortBy')]))
+				.pickBy(function (m) {
+					if (m.release_date == undefined || m.release_date == null)
+						return false;
+					var date = m.release_date.toISOString().split('-')[0];
+					return date >= (req.param('yearFrom') || 1900) && date <= (req.param('yearTo') || 2100);
+				})
+				.toArray()
+				.value();
+			sails.log.debug(movies)
+			sails.log.debug('movies.length = ' + _.size(movies));
+			sails.log.debug('order = ' + req.param('order'));
+			if (req.param('order') == 'desc') return res.json(_.reverse(movies));
 			return res.json(movies);
 		}
 	);
