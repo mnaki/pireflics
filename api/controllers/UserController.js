@@ -23,7 +23,7 @@ module.exports = {
                     
                     return res.redirect('/auth/login')
                 });
-            } 
+            }
             // else error
             else
                 return res.badRequest({ error: " email already used "});
@@ -37,7 +37,11 @@ module.exports = {
     edit_picture : function(req,res){
         if(req.user){
             User.update({ id : req.session.user.id }, { image : req.param('picture') }).exec(function afterupdate(err, updated){
-                if (err) return res.serverError(err);
+                if (err) {
+                    req.session.msg = err.code;
+                    res.redirect('/my_profil');
+                    return ;
+                }
                 req.session.user.image = req.param('picture');
                 res.redirect('/my_profil');
             });
@@ -52,7 +56,7 @@ module.exports = {
                 email : req.param('email'),
                 default_language : req.param('lang')}).exec(function (err, updated) {
                     if (err){
-                        console.log(err.code);
+                        sails.log.debug(err.code);
                         req.session.msg = err.code;
                         res.redirect('my_profil');
                     }
@@ -70,6 +74,11 @@ module.exports = {
         User.findOne({email: req.param('email')}).exec(function(err, user) {
 
             if (err) {return done(err);}
+            if(user == null){
+                req.session.msg = 'Mmmh, les informations ne concordent pas...';
+                res.redirect('/lost_password');
+                return;
+            }
             if(user.pwd == null){
                 req.session.msg = 'Vous n avez pas de mot de passe, connectez vous par l api habituel';
                 res.redirect('/auth/login');
