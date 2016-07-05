@@ -66,10 +66,10 @@ var sendCachedMovies = function (data, req, res) {
 	async.map(
 		data.results,
 		cacheMovies,
-		function (err, movies) {
-			if (err) {
+		function (e, movies) {
+			if (e) {
 				sails.log.debug(['sendCachedMovies', err]);
-				return res.json({err: {msg}});
+				return res.json({err:{msg:e}});
 			}
 			sails.log.debug('chaining methods')
 			movies = _.chain(movies)
@@ -110,8 +110,10 @@ module.exports = {
 				}
 				return sendCachedMovies(JSON.parse(data), req, res);
 			});
+		} catch (e) {
+			req.session.msg = e;
+			return res.redirect('/error');
 		}
-		catch (e) { return res.redirect('/error', e); }
 	},
 
 	search: function (req, res) {
