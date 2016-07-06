@@ -35,7 +35,7 @@ module.exports.routes = {
   ***************************************************************************/
 
   '/': {
-    view: 'homepage'
+    view: 'MovieController.search'
   },
 
   '/error': {
