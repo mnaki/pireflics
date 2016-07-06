@@ -31,12 +31,15 @@ var cacheMovies = function (m, callback) {
 			sails.log.debug([m.title, 'findOrCreate', err])
 			return callback(err);
 		}
+
+		// we don't wait for it to finish, we do it asyncly
 		fetchCast(rec, function (err, data) {
 			if (err) {
 				sails.log.debug([m.title, 'fetchCast', err])
-				return callback(err);
+				return;
 			}
 		});
+
 		sails.log.debug([m.title, 'success'])
 		return callback(null, rec);
 	});
@@ -196,9 +199,9 @@ module.exports = {
 					req.session.msg = err;
 					return res.redirect('/error');
 				} else {
-					result.movie.release_date = moment(result.movie.release_date).fromNow(); // pretify the date
-					result.movie.synopsis = _.truncate(result.movie.synopsis, { 'length': 500 }); // truncate the synopsis
-					return res.view('movie/play', results);
+					result.video.release_date = moment(result.video.release_date).fromNow(); // pretify the date
+					result.video.synopsis = _.truncate(result.video.synopsis, { 'length': 500 }); // truncate the synopsis
+					return res.view('movie/play', result);
 				}
 			})
 	},
