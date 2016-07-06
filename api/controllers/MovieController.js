@@ -29,13 +29,12 @@ var cacheMovies = function (m, callback) {
 	Movie.findOrCreate({imdb_id: m.id}, o).exec(function (err, rec) {
 		if (err || !rec || rec.length < 1) {
 			sails.log.debug([m.title, 'findOrCreate', err])
-			req.session.msg = err;
-			return res.redirect('/error');
+			return callback(err);
 		}
 		fetchCast(rec, function (err, data) {
 			if (err) {
 				sails.log.debug([m.title, 'fetchCast', err])
-				return err;
+				return callback(err);
 			}
 		});
 		sails.log.debug([m.title, 'success'])
@@ -83,8 +82,10 @@ var sendCachedMovies = function (data, req, res) {
 				.value();
 			sails.log.debug('movies.length = ' + _.size(movies));
 			sails.log.debug('order = ' + req.param('order'));
-			if (req.param('order') == 'desc') return res.json(_.reverse(movies));
-			return res.json(movies);
+			if (req.param('order') == 'desc')
+				return res.json(_.reverse(movies));
+			else
+				return res.json(movies);
 		}
 	);
 }
@@ -161,6 +162,48 @@ module.exports = {
 	},
 
 	play: function (req, res) {
+		async.waterfall([
+			function findMovie(cb) {
+				Movie.findOne({id: req.param('id')}).exec(cb)
+			},
+			function findComment(movie, cb) {
+				sails.log.debug(movie)
+				if (!movie.cast || movie.cast == {}) cb('Movie is still under process, try again later');
+				else Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
+					return cb(err, movie, comments)
+				});
+			},
+			function findUser(movie, comments, cb) {
+				if (!comments) cb('No comments');
+				else User.findOne(req.session.user.id).exec(function (err, user) {
+					return cb(err, movie, comments, user)
+				});
+			},
+			function updateUser(movie, comments, user, cb) {
+				if (!user) cb('No user');
+				else
+				{
+					if (!user.movies) user.movies = [movie.id];
+					else              user.movies.push(movie.id);
+					user.save(function (err) {
+						if (err) cb(err);
+						return cb(err, { video: movie, comments: comments })
+					})
+				}
+			}], function (err, result) {
+				if (err) {
+					sails.log.debug(err)
+					req.session.msg = err;
+					return res.redirect('/error');
+				} else {
+					result.movie.release_date = moment(result.movie.release_date).fromNow(); // pretify the date
+					result.movie.synopsis = _.truncate(result.movie.synopsis, { 'length': 500 }); // truncate the synopsis
+					return res.view('movie/play', results);
+				}
+			})
+	},
+/*
+	play: function (req, res) {
 		Movie.findOne({id: req.param('id')}).exec(function (err, movie) {
 			if (err || !movie) {
 				req.session.msg = err;
@@ -182,7 +225,8 @@ module.exports = {
 						user.movies = [movie.id];
 					else
 						user.movies.push(movie.id);
-					user.save(function (err) {
+					user.save(function (err)
+					{
 						if (err) {
 							req.session.msg = err;
 							return res.redirect('/error');
@@ -197,7 +241,7 @@ module.exports = {
 			});
 		});
 	},
-
+*/
 	add_comment: function(req, res){
 		Comment.create({comment: req.param('comment'), user: req.session.user.id, movie_id: req.param('id')}).exec(function (err, result){
 			if (err || !result || result.length < 1) {
