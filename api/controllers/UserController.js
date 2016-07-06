@@ -154,15 +154,20 @@ module.exports = {
             bcrypt.hash(pwd, salt, function (err, hash) {
                 if (err) {
                     sails.log.debug(err);
+                    req.session.debug('Mmmmh pour une raison obscure, le hashage du mdp à echoué');
+                    return res.view('/auth/login');
                 }
                 else {
                     pwd = hash;
                     User.update({email : req.session.tmp_email}, {pwd: pwd}).exec(function (err, result){
                         if(err){
-                            sails.log.debug(err)
+                            sails.log.debug(err);
+                            req.session.debug('Mmmmh pour une raison obscure, la sauvegarde du mdp à echoué');
+                            return res.view('/auth/login');
                         }
                     });
                     req.session.tmp_email = null;
+                    req.session.debug('Update successfull');
                     res.redirect('/auth/login');
 
                 }
