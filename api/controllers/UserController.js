@@ -9,24 +9,34 @@ var bcrypt = require('bcryptjs');
 module.exports = {
 
     create: function(req, res) {
-        if (req.body.email == undefined || req.body.firstname == undefined || req.body.lastname == undefined)
-            return res.badRequest();
+        sails.log.debug(req.body);
+        if (req.body.email == '' || req.body.firstname == '' || req.body.lastname == '' || req.body.pwd == '') {
+            req.session.msg = 'Tout les champs requis ne sont pas remplis ou pas correctement.';
+            return res.redirect('/auth/signup');
+        }
 
         User.find({ email: req.body.email }).exec(function ( err, users) {
-            if (err)
-                return res.badRequest(err);
+            if (err){
+                sails.log.debug(err);
+                return res.redirect('/auth/signup');
+            }
             if (users.length === 0) {
                 // if the mail not exist
                 User.create(req.body).exec(function(err, result){
-                    if (err) 
-                        return res.badRequest(err);
-                    
+                    if (err) {
+                        sails.log.debug(err);
+                        req.session.msg = err.code;
+                        return res.redirect('/auth/signup');
+                    }
+                    req.session.msg = 'Successfull !';
                     return res.redirect('/auth/login')
                 });
             }
-            // else error
-            else
-                return res.badRequest({ error: " email already used "});
+            else{
+                // Err if mail already exist
+                req.session.msg = 'Cet email est deja utilise';
+                return res.redirect('/auth/signup');
+            }
         })
     },
     
@@ -117,8 +127,10 @@ module.exports = {
         if(base64regex.test(req.param('token'))) {
             var token = new Buffer(req.param('token'), 'base64').toString('utf8');
             Token.findOne({token : token}).exec(function(err, returnToken){
-                if(err){return sails.log.debug(err)};
-
+                if(err){
+                    sails.log.debug(err);
+                    res.redirect('/auth/login');
+                }
                 if(!returnToken){
                     req.session.msg = 'Not a valid token.';
                     res.redirect('/auth/login');
