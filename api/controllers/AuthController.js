@@ -12,14 +12,11 @@ module.exports = {
     login: function(req, res) {
         passport.authenticate('local', function(err, user, info) {
             if ((err) || (!user)) {
-                return res.send({
-                    message: info.message,
-                    user: user
-                });
+                req.session.msg = 'Mmmmh, login has failed.';
+                return res.redirect('/auth/login')
             }
             req.logIn(user, function(err) {
                 if (err) res.send(err);
-
                 req.session.user = user;
                 res.redirect('/');
             });
