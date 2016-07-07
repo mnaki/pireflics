@@ -34,15 +34,12 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': {
-    view: 'MovieController.search'
-  },
-
   '/error': {
     view: 'error'
   },
 
   // Movie Controller
+  'get /': 'MovieController.search',
   'get /movie/search': 'MovieController.search',
   'get /movie/partial/:id': 'MovieController.partial',
   'get /movie/search/:name': 'MovieController.search',
