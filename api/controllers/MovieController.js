@@ -159,7 +159,11 @@ module.exports = {
 					req.session.msg = err;
 					return res.redirect('/error');
 				}
-				return res.view({ layout: false, movie: movie, user: user });
+				var seen = false;
+				if (!!user.movies && _.includes(user.movies, movie.id)) {
+					seen = true;
+				}
+				return res.view({ layout: false, movie: movie, user: user, seen: seen });
 			});
 		})
 	},
