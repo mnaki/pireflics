@@ -13,16 +13,19 @@ module.exports = {
       email: {
           type: 'email',
           required: true,
-          unique: true
+          unique: true,
+          email: true
       },
       pwd: {
           type: 'string'
       },
       firstname: {
           type: 'string',
+          minLength: 3
       },
       lastname: {
           type: 'string',
+          minLength: 3
       },
       default_language:{
           type: 'string',

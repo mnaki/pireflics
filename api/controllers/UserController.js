@@ -64,10 +64,11 @@ module.exports = {
                 { firstname : req.param('firstname'),
                 lastname : req.param('lastname'),
                 email : req.param('email'),
-                default_language : req.param('lang')}).exec(function (err, updated) {
-                    if (err){
-                        sails.log.debug(err.code);
-                        req.session.msg = err.code;
+                default_language : req.param('lang')})
+                .exec(function (err, updated) {
+                    if (err) {
+                        sails.log.debug(err);
+                        req.session.msg = "One field is invalid, name should be more than 3 chars and the mail should be valid";
                         res.redirect('my_profil');
                     }
                     else {
@@ -88,10 +89,6 @@ module.exports = {
                 req.session.msg = 'Mmmh, les informations ne concordent pas...';
                 res.redirect('/lost_password');
                 return;
-            }
-            if(user.pwd == null){
-                req.session.msg = 'Vous n avez pas de mot de passe, connectez vous par l api habituel';
-                res.redirect('/auth/login');
             }
             else{
                 if(req.param('firstname') == user.firstname && req.param('lastname') == user.lastname){
@@ -150,26 +147,30 @@ module.exports = {
     },
     new_pwd : function (req, res) {
         var pwd = req.param('password');
+        if (req.session.tmp_email == undefined || pwd == undefined || pwd.length < 8) {
+            req.session.msg = 'The password you tried to set is not valid (min 8 chars)';
+            return res.redirect('/auth/login');
+        }
         bcrypt.genSalt(10, function(err, salt) {
             bcrypt.hash(pwd, salt, function (err, hash) {
                 if (err) {
                     sails.log.debug(err);
-                    req.session.debug('Mmmmh pour une raison obscure, le hashage du mdp à echoué');
+                    req.session.msg = 'Mmmmh pour une raison obscure, le hashage du mdp à echoué';
                     return res.view('/auth/login');
                 }
                 else {
                     pwd = hash;
-                    User.update({email : req.session.tmp_email}, {pwd: pwd}).exec(function (err, result){
-                        if(err){
+                    User.update({email : req.session.tmp_email }, {pwd: pwd}).exec(function (err, result){
+                        if(err) {
                             sails.log.debug(err);
-                            req.session.debug('Mmmmh pour une raison obscure, la sauvegarde du mdp à echoué');
+                            req.session.msg = 'The password is not valid';
                             return res.view('/auth/login');
+                        } else {
+                            req.session.tmp_email = null;
+                            req.session.msg = 'Update successfull';
+                            res.redirect('/auth/login');
                         }
                     });
-                    req.session.tmp_email = null;
-                    req.session.debug('Update successfull');
-                    res.redirect('/auth/login');
-
                 }
             })
         });

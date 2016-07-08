@@ -9,6 +9,7 @@
  */
 module.exports = function(req, res, next) {
     if (req.session.user !== undefined) {
+        req.setLocale(req.session.user.default_language);
         return next();
     }
     else{

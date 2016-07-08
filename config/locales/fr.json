@@ -39,5 +39,8 @@
 	"Casting": "Acteurs",
 	"Character": "Personnage",
 	"Loading": "Chargement",
+	"Search": "Recherche",
+	"From": "De",
+	"To": "A",
 	"APILIMIT": "Pas de résultats / Trop de requêtes API"
 }
