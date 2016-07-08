@@ -187,6 +187,9 @@ module.exports = {
                                         torrent.path = torrent.path.replace(".mkv", ".mp4");
                                         torrent.save();
                                     })
+									.on('error', function () {
+										sails.log.debug("cant convert the movie");
+									})
                                     .save(path + '/' + target.name);
                                 }
 								else {

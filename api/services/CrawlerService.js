@@ -24,6 +24,7 @@ module.exports = {
         function(callback){
             kickass.search({
                 query: name,
+				category: 'movies',
                 sort_by: 'seeders',
                 order: 'desc',
                 language: 'en'
@@ -48,6 +49,7 @@ module.exports = {
                 filter: {
                     verified: false  
                 },
+				category: 'video',
                 orderBy: 'seeds',
                 sortBy: 'desc'
             })
