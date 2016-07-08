@@ -73,8 +73,15 @@ var sendCachedMovies = function (data, req, res) {
 				sails.log.debug(['sendCachedMovies', err]);
 				return res.json({err:{msg:e}});
 			}
+			sails.log.debug('sorting by ' + req.param('sortBy'));
 			movies = _.chain(movies)
-				.sortBy(req.param('sortBy'))
+				.sortBy(function (m) {
+					// ignore case when sorting by title
+					if (req.param('sortBy') == 'title') {
+						return _.lowerCase(m.title);
+					}
+					return m[req.param('sortBy')];
+				})
 				.pickBy(function (m) {
 					if (!m.release_date || !_.isFunction(m.release_date.toISOString))
 						return false;
@@ -175,7 +182,6 @@ module.exports = {
 					Movie.findOne({id: req.param('id')}).exec(cb)
 				},
 				function findComment(movie, cb) {
-					sails.log.debug(movie)
 					if (!movie.cast || movie.cast == {}) cb('Movie is still under process, try again later');
 					return Comment.find({movie_id: movie.id}).populate('user').exec(function (err, comments) {
 						return cb(err, movie, comments)
