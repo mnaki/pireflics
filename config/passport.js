@@ -26,13 +26,8 @@ passport.use(new FacebookStrategy({
         User.findOne({ email: profile.emails[0].value }, function(err, user) {
             if (err) {return done(err);}
             if(!user){
-                User.create({ email: profile.emails[0].value }, function(err, user) {
+                User.create({ email: profile.emails[0].value, firstname: profile.name.givenName,  lastname: profile.name.familyName, image: profile.photos[0].value }, function(err, user) {
                     if (err) { return done(err); }
-                    // if we created it, just update the name from facebook
-                    user.firstname = profile.name.givenName;
-                    user.lastname = profile.name.familyName;
-                    user.image = profile.photos[0].value;
-                    user.save();
                     done(null, user);
                 });
             }
@@ -67,14 +62,14 @@ passport.use(new OAuth2Strategy({
             User.findOne({ email: body.email }, function(err, user) {
                 if (err) {return done(err);}
                 if(!user){
-                    User.create({ email: body.email }, function(err, user) {
+                    var user = { email: body.email };
+                    var tmp = body.displayname.split(' ');
+                    user.firstname = tmp[0];
+                    user.lastname = tmp[1];
+                    user.image = body.image_url;
+
+                    User.create(user, function(err, user) {
                         if (err) { return done(err); }
-                        // if we created it, just update the name from api
-                        var tmp = body.displayname.split(' ');
-                        user.firstname = tmp[0];
-                        user.lastname = tmp[1];
-                        user.image = body.image_url;
-                        user.save();
                         done(null, user);
                     });
                 }

@@ -10,13 +10,14 @@ const fs            = require("fs-extra");
 const torrentStream = require('torrent-stream');
 const throttle      = require('throttle');
 const ffmpeg        = require('fluent-ffmpeg');
+const pump          = require('pump');
 
 var mimeTypes = {
 	"f4v":		"video/mp4",
 	"f4p":		"video/mp4",
 	"mp4":		"video/mp4",
-	"mkv":		"video/mp4", // will be converted into mp4
-	"avi":		"video/x-msvideo",
+	"mkv":		"video/webm", // will be converted into webm
+	"avi":		"video/webm",  // will be converted into webm
 	"mpa":		"video/mpeg",
 	"mpe":		"video/mpeg",
 	"mpeg":		"video/mpeg",
@@ -25,8 +26,14 @@ var mimeTypes = {
 	"mp2":		"video/mpeg",
 	"webm":		"video/webm",
 	"ogg":		"video/ogg",
-    "wmv":      "video/x-ms-wmv" // cannot be played
+    "wmv":      "video/webm" // will be converted into webm
 };
+
+var mimeToConvert = {
+    "wmv" : "webm",
+    "avi" : "webm",
+    "mkv" : "webm"
+}
 
 // used to store the engine already running to download file
 var engines = {};
@@ -176,22 +183,32 @@ module.exports = {
                                 var writer = fs.createWriteStream(path + '/' + target.name);
 								
 								// transcode if its mkv
-								if (ext == "mkv") {
-                                    ffmpeg(stream).fps(25).format('mp4')
+								if (mimeToConvert[ext] !== undefined) {
+                                    ffmpeg(stream).videoCodec('libvpx').audioCodec('libvorbis').format('webm')
+                                    .audioBitrate(128)
+                                    .videoBitrate(1024)
+                                    .outputOptions([
+                                        '-deadline realtime',
+                                        '-error-resilient 1'
+                                    ])
                                     .on('end', function () {
                                         sails.log.debug("TorrentController | download | Download of torrent " + torrent.id + " is finished");
                                         torrent.download = true;
                                         
 										torrent.size = fs.statSync(path + '/' + target.name).size;
-                                        fs.rename(path + '/' + target.name, path + '/' + target.name.replace(".mkv", ".mp4"));
-                                        torrent.path = torrent.path.replace(".mkv", ".mp4");
+                                        fs.rename(path + '/' + target.name, path + '/' + target.name.replace(ext, mimeToConvert[ext]));
+                                        torrent.path = torrent.path.replace(ext, mimeToConvert[ext]);
                                         torrent.save();
                                     })
+									.on('error', function (err) {
+										sails.log.debug("cant convert the movie");
+										sails.log.debug(err);
+									})
                                     .save(path + '/' + target.name);
                                 }
 								else {
-                                    stream.pipe(writer);
-                                     stream.on('end', function () {
+                                    pump(stream, writer);
+                                    stream.on('end', function () {
                                         sails.log.debug("TorrentController | download | Download of torrent " + torrent.id + " is finished");
                                         torrent.download = true;
                                         torrent.save();
@@ -230,10 +247,6 @@ module.exports = {
                 } else {
 					var ext = torrent.path.split('.').pop();
 
-                    // if mkv just wait for the conversion
-                    if (ext == "mkv")
-                        return res.json({ err: " please wait for the conversion" });
-
                     if (req.headers['range']) {
                         var parts = req.headers.range.replace(/bytes=/, "").split("-");
 
@@ -250,10 +263,27 @@ module.exports = {
                             'Content-Type': torrent.mime
                         });
 
-						file.pipe(res);
+                         // if mkv just wait for the conversion
+                        if (mimeToConvert[ext] !== undefined) {
+                            var convert = ffmpeg(file).videoCodec('libvpx').audioCodec('libvorbis').format('webm')
+                                    .audioBitrate(128)
+                                    .videoBitrate(1024)
+                                    .outputOptions([
+                                        '-threads 8',
+                                        '-deadline realtime',
+                                        '-error-resilient 1'
+                                    ])
+									.on('error', function (err) {
+										sails.log.debug("cant convert the movie");
+										sails.log.debug(err);
+									})
+                            pump(convert, res);
+                        }
+                        else
+						    pump(convert, res);
                     } else {
                         res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
-						engines[torrent.id].createReadStream().pipe(res);
+						pump(engines[torrent.id].createReadStream(), res);
                     }
                 }
 
@@ -280,11 +310,10 @@ module.exports = {
                         'Content-Length': chunksize, 
                         'Content-Type': torrent.mime
                     });
-                    file.pipe(res);
+                    pump(file, res);
                 } else {
                     res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
-                    fs.createReadStream(path).pipe(res);
-
+                    pump(fs.createReadStream(path), res);
 					// update model to know last date when torrent has been viewed
 					torrent.updatedAt = Date.now();
 					torrent.save();

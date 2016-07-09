@@ -219,9 +219,10 @@ module.exports = {
 	},
 
 	add_comment: function(req, res){
+		
 		Comment.create({comment: req.param('comment'), user: req.session.user.id, movie_id: req.param('id')}).exec(function (err, result){
 			if (err || !result || result.length < 1) {
-				req.session.msg = err;
+				req.session.msg = "your comment need to be at least 1 chars long";
 				return res.redirect('/error');
 			}
 			return res.redirect('/movie/play/'+req.param('id'));

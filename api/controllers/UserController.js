@@ -25,7 +25,7 @@ module.exports = {
                 User.create(req.body).exec(function(err, result){
                     if (err) {
                         sails.log.debug(err);
-                        req.session.msg = err.code;
+                        req.session.msg = "One field is invalid, name should be more than 3 chars and the mail should be valid";;
                         return res.redirect('/auth/signup');
                     }
                     req.session.msg = 'Successfull !';
@@ -48,7 +48,7 @@ module.exports = {
         if(req.user){
             User.update({ id : req.session.user.id }, { image : req.param('picture') }).exec(function afterupdate(err, updated){
                 if (err) {
-                    req.session.msg = err.code;
+                    req.session.msg = "The image you choose is not valid";
                     res.redirect('/my_profil');
                     return ;
                 }

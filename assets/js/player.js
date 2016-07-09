@@ -39,42 +39,6 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
 	
 	// start the download
 	$.get("/torrent/" + data.id + "/download").done(function (torrent) {
-
-		// if its mkv, we will convert it
-		if (torrent.path.split(".").pop() == "mkv") {
-			waitModalText.append("<p>! Need to convert the torrent, that gonna take some time </p>");
-
-			// start task to update percentage of convert
-			var percentage = setInterval(function () {
-				$.get("/torrent/" + data.id).done(function (torrent) {
-					// if the torrent has startd the convert yet, stop here
-					if (torrent.download) {
-						waitModalText.append("<p>> Ready ! </p>");
-						// stop the loading task
-						clearInterval(loading);
-						// clear modal
-						$('#waitModal').modal('hide');
-						
-						// setup the player
-						player.pause();
-						player.src([
-							{ type: torrent.mime, src: "/torrent/" + data.id + "/stream" }
-						]);
-						player.addRemoteTextTrack({
-							kind: "captions",
-							lang: "en",
-							label: "en",
-							src: "/videos/" + data.id + "/en.vtt"
-						})
-						$("#div_video").removeClass("vjs-playing").addClass("vjs-paused");
-						player.load();
-						// and play
-						player.play();
-					}
-				});
-			}, 5000);
-		} else {
-
 			waitModalText.append("<p>> Ready ! </p>");
 			// stop the loading task
 			clearInterval(loading);
@@ -95,8 +59,7 @@ $.get("/torrent/search/" + $("#title").text()).done(function (data) {
      		$("#div_video").removeClass("vjs-playing").addClass("vjs-paused");
 			player.load();
 			// and play
-			player.play();
-		}
+		
 	}).fail(function (err) {
 		console.log(err)
 		waitModalText.append("<p>! Cant start the torrent download for unknown reason </p>");

@@ -21,11 +21,13 @@ module.exports = {
       },
       firstname: {
           type: 'string',
-          minLength: 3
+          minLength: 3,
+          required: true
       },
       lastname: {
           type: 'string',
-          minLength: 3
+          minLength: 3,
+          required: true
       },
       default_language:{
           type: 'string',
