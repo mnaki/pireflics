@@ -67,18 +67,20 @@ module.exports = {
 					sails.log.debug("TorrentController | search |  No torrent found for title " + name + " start crawling ...")
 
 					CrawlerService.search(name, function ( err, result ) {
+						sails.log.debug({result})
 						// if nothing is found send no result
-						if ( err || result == null) {
-							res.notFound(); return ;
-						}
+						// if ( err || result == null) {
+						// 	res.notFound(); return ;
+						// }
 
 						// set the title to search it next time
 						result.title = result.info.title;
 						result.download = false;
-							
+
 						// and register it in the database
 						Torrent.create(result, function(err, model) {
-							if (err) 
+							sails.log.debug({tryTorrentCreate: [err, model]})
+							if (err)
 								return res.serverError(err);
 							else {
 								sails.log.debug("TorrentController | search |  Crawler has found a torrent for movie " + movie.id + ", registering it under id " + model.id);
@@ -111,13 +113,13 @@ module.exports = {
                 var torrent = results[0];
 
                 // if the torrent is already downloaded
-                if (torrent.download) 
+                if (torrent.download)
                    return res.json(torrent.toJSON());
-                
+
                 // if the engine is already downloading the torrent
-				else if (engines[torrent.id] !== undefined) 
+				else if (engines[torrent.id] !== undefined)
 					return res.ok(torrent.toJSON());
-				
+
 
                  // start the download
                 var engine = torrentStream(torrent.magnet);
@@ -131,7 +133,7 @@ module.exports = {
 						sails.log.debug("TorrentController | subtitle | EN subtitle found for torrent " + torrent.id);
                 });
 
-                engine.on('ready', function() {    
+                engine.on('ready', function() {
                     var target = null;
 
                     // find the video that interest us
@@ -146,7 +148,7 @@ module.exports = {
                         }
 
                         // if we didnt have yet found video, set this one and continue
-                        if (target == null) 
+                        if (target == null)
                             target = file;
                         // if the file is bigger that the one already get, get this one
                         else if (file.length > target.length) {
@@ -176,12 +178,12 @@ module.exports = {
                                 torrent.size = target.length;
 								torrent.mime = mimeTypes[ext];
                                 torrent.save();
-                                
+
                                 // send the model with the path
                                 res.ok(torrent.toJSON());
 
                                 var writer = fs.createWriteStream(path + '/' + target.name);
-								
+
 								// transcode if its mkv
 								if (mimeToConvert[ext] !== undefined) {
                                     ffmpeg(stream).videoCodec('libvpx').audioCodec('libvorbis').format('webm')
@@ -194,7 +196,7 @@ module.exports = {
                                     .on('end', function () {
                                         sails.log.debug("TorrentController | download | Download of torrent " + torrent.id + " is finished");
                                         torrent.download = true;
-                                        
+
 										torrent.size = fs.statSync(path + '/' + target.name).size;
                                         fs.rename(path + '/' + target.name, path + '/' + target.name.replace(ext, mimeToConvert[ext]));
                                         torrent.path = torrent.path.replace(ext, mimeToConvert[ext]);
@@ -214,9 +216,9 @@ module.exports = {
                                         torrent.save();
                                     });
                                 }
-									
-                                
-                               
+
+
+
                             }
                         });
                     });
@@ -256,9 +258,9 @@ module.exports = {
 
                         var file = engines[torrent.id].createReadStream({start: start, end: end});
 
-                        res.writeHead(206, { 
-                            'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size, 
-                            'Accept-Ranges': 'bytes', 
+                        res.writeHead(206, {
+                            'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size,
+                            'Accept-Ranges': 'bytes',
                             'Content-Length': chunksize,
                             'Content-Type': torrent.mime
                         });
@@ -287,7 +289,7 @@ module.exports = {
                     }
                 }
 
-             } 
+             }
              // if the file is download, just stream the content
              else {
                 var torrent = results[0];
@@ -304,10 +306,10 @@ module.exports = {
 
                     var file = fs.createReadStream(path, {start: start, end: end});
 
-                    res.writeHead(206, { 
-                        'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size, 
-                        'Accept-Ranges': 'bytes', 
-                        'Content-Length': chunksize, 
+                    res.writeHead(206, {
+                        'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size,
+                        'Accept-Ranges': 'bytes',
+                        'Content-Length': chunksize,
                         'Content-Type': torrent.mime
                     });
                     pump(file, res);
@@ -323,4 +325,3 @@ module.exports = {
     }
 
 };
-

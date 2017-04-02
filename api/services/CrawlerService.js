@@ -17,11 +17,12 @@ module.exports = {
    * `CrawlerService.search()`
    */
   search: function (name, callback) {
-    
+
     // start both query in parallel, first finish, first choosen
     async2.parallel([
         // search via kickass api
         function(callback){
+            callback(); // DISABLED KICKASS
             kickass.search({
                 query: name,
 				category: 'movies',
@@ -36,7 +37,7 @@ module.exports = {
                     callback(null, response.results[0])
                 }
                 // if we found nothing
-                else 
+                else
                     callback(true);
             }).catch(function ( error ) {
                 sails.log.debug("Error while crawling kickasstorrent : \n" + JSON.stringify(error));
@@ -47,7 +48,7 @@ module.exports = {
         function(callback) {
             piratebay.search(name, {
                 filter: {
-                    verified: false  
+                    verified: false
                 },
 				category: 'video',
                 orderBy: 'seeds',
@@ -58,10 +59,11 @@ module.exports = {
                 if (response.length > 0) {
                     // set his source to normalise it after
                     response[0].source = "piratebay";
+                    sails.log.debug({pirateBayResponse: response[0]})
                     callback(null, response[0]);
                 }
                 // if we found nothing
-                else 
+                else
                     callback(true);
             })
             .catch(function( error ) {
@@ -76,7 +78,7 @@ module.exports = {
             callback(true, null);
             return ;
         }
-        
+
 		var torrent = {};
 		if (result[0] == undefined)
 			torrent = result[1];
@@ -86,7 +88,7 @@ module.exports = {
 			torrent = result[0];
 		else
 			torrent = result[1];
-		
+
 		// we need to normalise the json return to handle it no matter where it has been crawled
 		var returned = {};
 		returned.seeds = torrent.seeders || torrent.seeds;
@@ -103,4 +105,3 @@ module.exports = {
     });
   }
 };
-
