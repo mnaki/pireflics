@@ -1,19 +1,14 @@
-# pireflics
+# Pireflics
 
-#### Seamless live-streaming
-
-![](https://im2.ezgif.com/tmp/ezgif-2-d96aa98976.gif)
+## Netflix-like torrent-based video streaming platform (school homework)
 
 
-#### Browse videos from all torrent providers
+###  Main features :
 
-![](https://im2.ezgif.com/tmp/ezgif-2-1672b18284.gif)
+- #### Seamless live-streaming
 
+- #### Browse videos from all torrent providers
 
-#### Play/Pause while live-streaming
-![](https://im2.ezgif.com/tmp/ezgif-2-f658d4d28b.gif)
+- #### Play/Pause while live-streaming
 
-
-#### Read movie full description
-
-![](https://im2.ezgif.com/tmp/ezgif-2-adfa52fbea.gif)
+- #### Full movie description
