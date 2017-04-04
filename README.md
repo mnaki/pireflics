@@ -3,6 +3,7 @@
 ## Netflix-like torrent-based video streaming platform (school homework)
 
 ![Demo](https://github.com/mnaki/pireflics/raw/master/demo.gif)
+![Streaming](https://github.com/mnaki/pireflics/raw/master/demo2.gif)
 
 ###  Main features :
 
