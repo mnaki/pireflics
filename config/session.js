@@ -49,13 +49,13 @@ module.exports.session = {
   /***************************************************************************
   *                                                                          *
   * The following values are optional, if no options are set a redis         *
-  * instance running on localhost is expected. Read more about options at:   *
+  * instance running on 80.236.115.131 is expected. Read more about options at:   *
   *                                                                          *
   * https://github.com/visionmedia/connect-redis                             *
   *                                                                          *
   ***************************************************************************/
 
-  // host: 'localhost',
+  // host: '80.236.115.131',
   // port: 6379,
   // ttl: <redis session TTL in seconds>,
   // db: 0,
@@ -75,7 +75,7 @@ module.exports.session = {
   ***************************************************************************/
 
   // adapter: 'mongo',
-  // url: 'mongodb://user:password@localhost:27017/dbname', // user, password and port optional
+  // url: 'mongodb://user:password@80.236.115.131:27017/dbname', // user, password and port optional
 
   /***************************************************************************
   *                                                                          *

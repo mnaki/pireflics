@@ -41,9 +41,9 @@ passport.use(new FacebookStrategy({
 passport.use(new OAuth2Strategy({
     authorizationURL: 'https://api.intra.42.fr/oauth/authorize',
     tokenURL: 'https://api.intra.42.fr/oauth/token',
-    clientID: '24e1a4803e1b4a813bc22d4368cbf33b150ff32fad733a21d8855792b828f59c',
-    clientSecret: '5dc5d8ccc1e2d4ba3c2e832aa0986b3dc8ece637015dd6d6fe7306bc27397fc1',
-    callbackURL: "http://localhost:1337/auth/duoquadra/callback"
+    clientID: '72c046c7c4a1849a572bdb82c6baee2da68c764b7182afd19acf937a2aac8f13',
+    clientSecret: '5b12abeab3b030711ea3d9c525c552d5c4ecc5130c200a7faa8f4fc6ef68e632',
+    callbackURL: "http://80.236.115.131:1337/auth/duoquadra/callback"
   },
   function(accessToken, refreshToken, profile, done) {
 
