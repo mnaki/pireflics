@@ -12,6 +12,7 @@
     "chokidar": "^1.6.1",
     "ejs": "2.3.4",
     "fluent-ffmpeg": "^2.1.0",
+    "forever": "^1.0.0",
     "fs-extra": "^0.30.0",
     "get": "^1.4.0",
     "grunt": "0.4.5",
@@ -64,7 +65,8 @@
   },
   "scripts": {
     "debug": "node debug app.js",
-    "start": "sails l"
+    "start": "NODE_ENV=production forever --minUptime 1000 --spinSleepTime 1000 app.js",
+    "dev": "sails l"
   },
   "main": "app.js",
   "repository": {

@@ -29,9 +29,9 @@ module.exports.connections = {
   *                                                                          *
   ***************************************************************************/
 
-  //localDiskDb: {
-  //  adapter: 'sails-disk'
-  //},
+  localDiskDb: {
+    adapter: 'sails-disk'
+  },
 
   /***************************************************************************
   *                                                                          *
@@ -42,13 +42,13 @@ module.exports.connections = {
   *                                                                          *
   ***************************************************************************/
 
-   mysqlserver: {
+  /*mysqlserver: {
     adapter: 'sails-mysql',
     host: 'status.hardfight.fr',
     user: 'hypertube',
     password: '', //optional
     database: 'hypertube' //optional
-  },
+   },*/
 
   /***************************************************************************
   *                                                                          *

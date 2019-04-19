@@ -243,52 +243,55 @@ module.exports = {
             else if (!results[0].download) {
                 var torrent = results[0];
                 sails.log.debug("TorrentController | stream | Streaming torrent " + torrent.id + " directly from stream");
-
-                if (engines[torrent.id] === undefined) {
-                    return res.json({ err: "please start the download before ask for a stream" });
-                } else {
-					var ext = torrent.path.split('.').pop();
-
-                    if (req.headers['range']) {
-                        var parts = req.headers.range.replace(/bytes=/, "").split("-");
-
-                        var start = parseInt(parts[0], 10);
-                        var end = torrent.size - 1;
-                        var chunksize = ( end - start ) + 1;
-
-                        var file = engines[torrent.id].createReadStream({start: start, end: end});
-
-                        res.writeHead(206, {
-                            'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size,
-                            'Accept-Ranges': 'bytes',
-                            'Content-Length': chunksize,
-                            'Content-Type': torrent.mime
-                        });
-
-                         // if mkv just wait for the conversion
-                        if (mimeToConvert[ext] !== undefined) {
-                            var convert = ffmpeg(file).videoCodec('libvpx').audioCodec('libvorbis').format('webm')
-                                    .audioBitrate(128)
-                                    .videoBitrate(1024)
-                                    .outputOptions([
-                                        '-threads 8',
-                                        '-deadline realtime',
-                                        '-error-resilient 1'
-                                    ])
-									.on('error', function (err) {
-										sails.log.debug("cant convert the movie");
-										sails.log.debug(err);
-									})
-                            pump(convert, res);
-                        }
-                        else
-						    pump(convert, res);
+                try {
+                    if (engines[torrent.id] === undefined) {
+                        return res.json({ err: "please start the download before ask for a stream" });
                     } else {
-                        res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
-						pump(engines[torrent.id].createReadStream(), res);
-                    }
-                }
+                        var ext = torrent.path.split('.').pop();
 
+                        if (req.headers['range']) {
+                            var parts = req.headers.range.replace(/bytes=/, "").split("-");
+
+                            var start = parseInt(parts[0], 10);
+                            var end = torrent.size - 1;
+                            var chunksize = ( end - start ) + 1;
+
+                            var file = engines[torrent.id].createReadStream({start: start, end: end});
+
+                            res.writeHead(206, {
+                                'Content-Range': 'bytes ' + start + '-' + end + '/' + torrent.size,
+                                'Accept-Ranges': 'bytes',
+                                'Content-Length': chunksize,
+                                'Content-Type': torrent.mime
+                            });
+
+                            // if mkv just wait for the conversion
+                            if (mimeToConvert[ext] !== undefined) {
+                                var convert = ffmpeg(file).videoCodec('libvpx').audioCodec('libvorbis').format('webm')
+                                        .audioBitrate(128)
+                                        .videoBitrate(1024)
+                                        .outputOptions([
+                                            '-threads 8',
+                                            '-deadline realtime',
+                                            '-error-resilient 1'
+                                        ])
+                                        .on('error', function (err) {
+                                            sails.log.debug("cant convert the movie");
+                                            sails.log.debug(err);
+                                        })
+                                pump(convert, res);
+                            }
+                            else
+                                pump(convert, res);
+                        } else {
+                            res.writeHead(200, { 'Content-Length': torrent.size, 'Content-Type': torrent.mime });
+                            pump(engines[torrent.id].createReadStream(), res);
+                        }
+                    }
+
+                } catch (e) {
+                    sails.log.error("PUMP ERROR" + e)
+                }
              }
              // if the file is download, just stream the content
              else {

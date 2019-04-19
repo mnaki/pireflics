@@ -18,6 +18,7 @@ module.exports = {
             req.logIn(user, function(err) {
                 if (err) res.send(err);
                 req.session.user = user;
+                req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // Cookie expires after 30 days
                 res.redirect('/');
             });
         })(req, res);
