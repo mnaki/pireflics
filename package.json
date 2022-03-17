@@ -31,7 +31,7 @@
     "imdb": "^1.1.0",
     "include-all": "~0.1.6",
     "kickass-api": "0.0.3",
-    "lodash": "^4.13.1",
+    "lodash": "^4.17.21",
     "md5": "^2.1.0",
     "moment": "^2.13.0",
     "node-schedule": "^1.1.1",
